@@ -15,9 +15,10 @@ Note that the script continues even after reaching the current day. I stop runni
 ### Arson analyser
 Feed the CSV output from step 1 to Arson_Analyser_Latest_update 
 There's 3 things you need to do before you can run this script: 
-(a) Create a Google Earth Engine project name in line 70, you can create a project here, 
-(b) Edit the base directory in line 16
-(c) Have the data.csv output from the first step ready in the correct folder, see line 17. If you want to know a bit about what the script and GEE do, you can read a summary of the methodology here
+- Create a Google Earth Engine project name in line 70, you can create a project here, 
+- Edit the base directory in line 16
+- Have the data.csv output from the first step ready in the correct folder, see line 17. If you want to know a bit about what the script and GEE do, you can read a summary of the methodology here
+
 Insert the CSV output from step 2 in Google Sheets as a new tab into the fire sheet for analysis and triage:
 - Rename tab, e.g. 'Jan_16' (Jan_16 from here on)
 - Sort column 'burn_scar_detected' from Z to A
