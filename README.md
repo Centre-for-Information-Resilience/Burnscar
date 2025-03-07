@@ -1,12 +1,29 @@
 # Fire Detection and Mapping 
 
-### This is a work in progress proejct that is aimed at refactoring a number of different components. 
-### Minimum objective is to make this easier to run and to better manage dependencies 
-### Ideal outcome is to have this deployable. 
+## TO-DO
+1. Understand what code does
+2. Split into logical components
+    1. Datafetcher
+        1. Rate Limiter
+    2. 
+
+## Ideas
+- Use DuckDB for persistence between runs
+- Implement rate limiter -> does api return rate limit headers?
+- Support MacOS / all OS's
+
+## Process mapping
+Data fetcher -> 
+
+### Goals
+This is a work in progress proejct that is aimed at refactoring a number of different components. 
+
+- Minimum objective is to make this easier to run and to better manage dependencies.
+- Ideal outcome is to have this deployable.
 
 ## How to run
 ### Data Fetcher
-Run DataFetcher (gets FIRMS data points from FIRMS API. You first need to insert a map key in line 9)
+Run DataFetcher (gets FIRMS data points from FIRMS API. You first need to insert a map key in line 9).
 The API allows download in batches of 10 days, the script therefore uses 9 days increments. You need to put the start date in line 22, (I always put the current or last date of the period I'm using to triage – see flow chart – in a note in that line for the next time I'm running this script
 To prevent FIRMS rate limiting or blocking the map key, the scripts sleeps in between increments, so it takes a while.
 For my own convenience, I've added a line print(f"Currently checking for date {current_date}") in the While loop at the end, so that I can see where the script currently is. Note that "current date" means a period of 10 days up to that date. (If this line does not already exists in the shared script) 
