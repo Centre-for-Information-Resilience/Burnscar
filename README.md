@@ -8,12 +8,10 @@
     2. 
 
 ## Ideas
-- Use DuckDB for persistence between runs
+- Use DuckDB or Polars/parquet for persistence between runs
 - Implement rate limiter -> does api return rate limit headers?
 - Support MacOS / all OS's
 
-## Process mapping
-Data fetcher -> 
 
 ### Goals
 This is a work in progress proejct that is aimed at refactoring a number of different components. 
@@ -64,15 +62,15 @@ Human verification in the final sheet, completing entries and reviewing before
 
 Prio's 1a,b,c are related and should be ordered or merged if more convenient, but if I have to order them, then prio 1a would have the highest priority, and then b,c. This is in lesser extent also true for prio 2 and 3. Important note: It seems that the Arson Analyser stops checking for new Sentinel-2 imagery after there's no good imagery available for more than a number of days after the incident. I'll double check this with Micheal/Tarig, who have been working on both scripts. It would be good to know if it makes sense to extent this period for a bit, as I now still get more than 50% back with no image in the second run.
 
-Prio 1a: Edit the Arson Analyser script so that there is a second output with all detections that come back as 'too cloud' or 'no image' in the same format as the input (saves step 4a-4c)
-Prio 1b: Edit the Arson Analyser script so that it also works through the second output from prio 1a on request, while still having an output that distinguishes between these and the 'new' detections
-Prio 1c: Merge the DataFetcher script with the Arson Analyser so that you only have to run one script instead of two, preferably by selecting a specific period you want to check (merges steps 1 and 2)
-Prio 2a: Remove duplicate detections within the same boundary (if this is done before the process in GEE, this saves time/resources as well). The downside is that we then have to check for other detections within the same boundary on the same day, but I think this is more efficient. (saves step 3d)
-Prio 2b: Merge (preferred way, e.g. by adding a column with number of days) and/or remove duplicate detections within the same boundary on subsequent days (saves time in the final verification process)
-Prio 3: Edit the Arson Analyser script so that the first columns of the output are the same as column E-P (with column E on "In Progress" and F-J empty) in the 'Main' tab of the fire sheet (saves step 3f) 
+- Prio 1a: Edit the Arson Analyser script so that there is a second output with all detections that come back as 'too cloud' or 'no image' in the same format as the input (saves step 4a-4c)
+- Prio 1b: Edit the Arson Analyser script so that it also works through the second output from prio 1a on request, while still having an output that distinguishes between these and the 'new' detections
+- Prio 1c: Merge the DataFetcher script with the Arson Analyser so that you only have to run one script instead of two, preferably by selecting a specific period you want to check (merges steps 1 and 2)
+- Prio 2a: Remove duplicate detections within the same boundary (if this is done before the process in GEE, this saves time/resources as well). The downside is that we then have to check for other detections within the same boundary on the same day, but I think this is more efficient. (saves step 3d)
+- Prio 2b: Merge (preferred way, e.g. by adding a column with number of days) and/or remove duplicate detections within the same boundary on subsequent days (saves time in the final verification process)
+- Prio 3: Edit the Arson Analyser script so that the first columns of the output are the same as column E-P (with column E on "In Progress" and F-J empty) in the 'Main' tab of the fire sheet (saves step 3f) 
 Anything else flagged by Lewis after reading through the steps and looking at scripts etc.
 
 Other potential improvements: 
-Incorporate controlled list of village names 
-Put damage assessment numbers back in
-Use Planet as backup if S-2 fails (would be a major improvement, but also investment in development, quota)
+- Incorporate controlled list of village names 
+- Put damage assessment numbers back in
+- Use Planet as backup if S-2 fails (would be a major improvement, but also investment in development, quota)
