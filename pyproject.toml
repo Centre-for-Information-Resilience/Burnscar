@@ -8,9 +8,14 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "duckdb>=1.2.1",
     "earthengine-api>=1.5.4",
     "geopandas>=1.0.1",
+    "httpx>=0.28.1",
     "pandas>=2.2.3",
+    "pydantic>=2.10.6",
+    "pydantic-settings>=2.8.1",
+    "python-dotenv>=1.0.1",
     "shapely>=2.0.7",
     "tqdm>=4.67.1",
 ]
@@ -21,3 +26,10 @@ arson-analyser = "arson_analyser:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pytest>=8.3.5",
+    "ruff>=0.9.10",
+]
