@@ -18,6 +18,7 @@ class DuckDBStorage:
     def __enter__(self):
         self.conn = duckdb.connect(self.path)
 
+        self.conn.execute("SET enable_progress_bar = true;")
         self._install_extensions()
 
     def __exit__(self, exc_type, exc_val, exc_tb):

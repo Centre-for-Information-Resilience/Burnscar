@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class Step(StrEnum):
+    ingestion = "ingestion"
     filtering = "filtering"
     clustering = "clustering"
     analysis = "analysis"
@@ -37,7 +38,6 @@ def create_log_table(storage: DuckDBStorage):
         );
         """
 
-    logger.info(sql_string)
     storage.conn.execute(sql_string)
 
 
@@ -70,7 +70,6 @@ def update_log(
             partition_date = ? AND
             step = ?
         """
-    logger.info(sql_string)
     storage.conn.execute(
         sql_string, (status, int(increment_attempts), partition_date, step)
     )
