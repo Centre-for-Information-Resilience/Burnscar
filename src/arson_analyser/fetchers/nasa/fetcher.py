@@ -2,30 +2,21 @@ import datetime
 import json
 import logging
 import time
-from typing import Generator, Literal
+from pathlib import Path
+from typing import Iterable, Literal, TypeVar
 
 import httpx
+import pandas as pd
 from pydantic import BaseModel
 
+from ...utils import retry
 from .schema import NASARecord
+
+T = TypeVar("T", bound=BaseModel)
 
 logger = logging.getLogger(__name__)
 
-
-def date_range(
-    from_date: datetime.date, to_date: datetime.date, period: int = 10
-) -> Generator[tuple[int, datetime.date], None, None]:
-    # NASA uses [DATE] .. [DATE + DAY_RANGE-1] to fetch data
-    days_in_range = (to_date - from_date).days
-
-    for offset in range(days_in_range // period + 1):
-        date = from_date + datetime.timedelta(days=offset * period)
-        days_left = (to_date - date).days + 1
-
-        if days_left < period:  # Last period
-            yield (days_left, date)
-        else:
-            yield (period, date)
+client = httpx.Client(timeout=60)
 
 
 class RateLimits(BaseModel):
@@ -39,7 +30,7 @@ class RateLimits(BaseModel):
         return self.limit - self.used
 
     def update(self):
-        response = httpx.get(
+        response = client.get(
             "https://firms.modaps.eosdis.nasa.gov/mapserver/mapkey_status/?MAP_KEY="
             + self.api_key
         )
@@ -56,80 +47,95 @@ class RateLimits(BaseModel):
 
 
 class NASAFetcher:
+    satellites = ("SNPP", "NOAA20", "NOAA21")
+    base_url = "https://firms.modaps.eosdis.nasa.gov/api/country/csv"
+
     def __init__(
         self,
         api_key: str,
         instrument: Literal["VIIRS"] = "VIIRS",
-        satellite: Literal["SNPP", "NOAA20", "NOAA21"] = "NOAA21",
         data_version: Literal["URT", "RT", "NRT", "SP"] = "NRT",
+        data_path: Path = Path("data"),
     ):
         self.api_key = api_key
         self.instrument = instrument
-        self.satellite = satellite
         self.data_version = data_version
-        self.base_url = "https://firms.modaps.eosdis.nasa.gov/api/country/csv"
+        self.data_path = data_path
+        self.out_path = self.data_path / "raw"
 
         self.rate_limits = RateLimits(api_key=api_key)
         self.rate_limits.update()
 
-        self.client = httpx.Client(timeout=60)
-
-    def fetch(self, country_id: str, start_date: datetime.date, days: int) -> str:
+    @retry
+    def _fetch_raw(self, country_id: str, date: datetime.date, satellite: str) -> str:
         # wait for enough available transactions in our rate limit
-        while self.rate_limits.remaining < 300:
+        # NASA uses some sort of rolling window for rate limits
+        while self.rate_limits.remaining < 30:
             logger.info(
-                f"Rate limit exceeded, waiting for 30 seconds. {self.rate_limits}"
+                f"Rate limit exceeded, waiting for 10 seconds. {self.rate_limits}"
             )
-            time.sleep(30)
+            time.sleep(10)
             self.rate_limits.update()
 
-        logger.info(f"Fetching data for {country_id} from {start_date} for {days} days")
+        logger.info(f"Fetching data for {country_id} on {date}")
 
         url = (
             self.base_url
-            + f"/{self.api_key}/{self.instrument}_{self.satellite}_{self.data_version}/{country_id}/{days}/{start_date}"
+            + f"/{self.api_key}/{self.instrument}_{satellite}_{self.data_version}/{country_id}/1/{date}"
         )
-        response = self.client.get(url)
+        response = client.get(url)
 
         if not response.text.startswith("country_id,latitude,longitude"):
             raise ValueError("Invalid response: " + response.text)
 
         return response.text
 
-    def parse(self, data: str) -> Generator[NASARecord, None, None]:
-        lines = data.split("\n")
+    def parse(self, data: str) -> list[NASARecord]:
+        lines = data.splitlines()
         header = lines[0].split(",")
 
+        parsed_data = []
         for record in lines[1:]:
             record_data = record.split(",")
             record_dict = dict(zip(header, record_data))
-            yield NASARecord.model_validate(record_dict)
+            parsed_data.append(NASARecord.model_validate(record_dict))
 
-    def write(self, data: list[NASARecord], filename: str):
-        with open(filename, "w") as file:
-            json.dump(
-                [record.model_dump(mode="json") for record in data], file, indent=2
-            )
+        return parsed_data
 
-    def run(
+    def fetch(
         self,
         country_id: str,
-        start_date: datetime.date,
-        end_date: datetime.date,
-        days: int,
-    ) -> Generator[NASARecord, None, None]:
-        for days, date in date_range(start_date, end_date, days):
-            data = self.fetch(country_id, date, days)
-            yield from self.parse(data)
+        date: datetime.date,
+        satellites: Iterable[str] | None = None,
+    ) -> list[NASARecord]:
+        # We are iterating over the satellites because they are one constellation
+        # and the data they output is in the same format. This way we can partion
+        # by just country and date.
+        parsed_data = []
+        for satellite in satellites or self.satellites:
+            data = self._fetch_raw(country_id, date, satellite)
             self.rate_limits.update()
+            parsed_data += self.parse(data)
 
-    def run_and_write(
-        self,
-        country_id: str,
-        start_date: datetime.date,
-        end_date: datetime.date = datetime.date.today() + datetime.timedelta(days=1),
-        days: int = 10,
-        filename: str = "data.json",
-    ):
-        data = list(self.run(country_id, start_date, end_date, days))
-        self.write(data, filename)
+        return parsed_data
+
+    @staticmethod
+    def serialize(data: list[T]) -> list[dict]:
+        return [record.model_dump() for record in data]
+
+    @staticmethod
+    def deserialize(data: list[dict], model: T) -> list[T]:
+        return [model.model_validate(record) for record in data]
+
+    @staticmethod
+    def to_dataframe(data: list[T]) -> pd.DataFrame:
+        return pd.DataFrame([record.model_dump() for record in data])
+
+    def to_parquet(self, data: list[T], path: Path):
+        df = self.to_dataframe(data)
+        df.to_parquet(path, index=False)
+
+    @staticmethod
+    def to_json(data: list[T], path: Path):
+        with open(path, "w") as f:
+            json.dump([record.model_dump(mode="json") for record in data], f, indent=2)
