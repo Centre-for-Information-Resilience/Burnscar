@@ -1,5 +1,9 @@
+.DS_Store
 .venv
 .mypy_cache
 .pytest_cache
 .env
 **/*.pyc
+
+data/*
+duckdb/*

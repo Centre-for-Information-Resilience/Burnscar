@@ -1,8 +1,11 @@
-from pydantic_settings import BaseSettings
+from pathlib import Path
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Config(BaseSettings):
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
 
-    nasa_api_key: str = ""
+    api_key_nasa: str = ""
+    path_data: Path = Path("data")
+    path_duckdb: Path = Path("duckdb")
