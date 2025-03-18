@@ -10,7 +10,7 @@ GET https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv/{{$dotenv NAS
 
 
 ### Active fire data
-GET https://firms.modaps.eosdis.nasa.gov/api/country/csv/{{$dotenv NASA_API_KEY}}/VIIRS_NOAA21_NRT/SDN/10/2025-03-12
+GET https://firms.modaps.eosdis.nasa.gov/api/country/csv/{{$dotenv NASA_API_KEY}}/VIIRS_SNPP_NRT/SDN/1/2025-03-12
 
 
 ### Active fire data

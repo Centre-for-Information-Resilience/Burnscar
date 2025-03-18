@@ -13,6 +13,7 @@ dependencies = [
     "geopandas>=1.0.1",
     "httpx>=0.28.1",
     "pandas>=2.2.3",
+    "pyarrow>=19.0.1",
     "pydantic>=2.10.6",
     "pydantic-settings>=2.8.1",
     "python-dotenv>=1.0.1",
@@ -30,6 +31,7 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "mypy>=1.15.0",
+    "pandas-stubs>=2.2.3.250308",
     "pytest>=8.3.5",
     "ruff>=0.9.10",
 ]
