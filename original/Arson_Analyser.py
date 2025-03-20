@@ -10,7 +10,7 @@ import pandas as pd
 from shapely.geometry import Point
 from tqdm import tqdm
 
-from arson_analyser.Burn_Scar_Detection_Utils import (
+from .Burn_Scar_Detection_Utils import (
     get_nearest_town,
     spatially_associate_arson_events,
     validate_FIRMS,

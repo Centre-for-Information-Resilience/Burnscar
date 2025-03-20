@@ -9,3 +9,5 @@ class Config(BaseSettings):
     api_key_nasa: str = ""
     path_data: Path = Path("data")
     path_duckdb: Path = Path("duckdb")
+    path_queries: Path = Path(__file__).parent / "pipeline" / "queries"
+    path_areas_whitelist: Path = Path("geo/urban_areas.gpkg")

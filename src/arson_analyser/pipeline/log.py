@@ -19,7 +19,6 @@ class Status(StrEnum):
     pending = "pending"
     success = "success"
     failed = "failed"
-    abandoned = "abandoned"
 
 
 def allowed_values(enum: Type[StrEnum]) -> str:
@@ -29,6 +28,7 @@ def allowed_values(enum: Type[StrEnum]) -> str:
 def create_log_table(storage: DuckDBStorage):
     sql_string = f"""
         CREATE TABLE IF NOT EXISTS processing_log (
+            id BIGINT
             partition_date DATE NOT NULL,
             step VARCHAR NOT NULL NOT NULL CHECK (step IN {allowed_values(Step)}),
             status VARCHAR NOT NULL CHECK (status IN {allowed_values(Status)}) DEFAULT '{Status.pending}',
@@ -71,5 +71,11 @@ def update_log(
             step = ?
         """
     storage.conn.execute(
-        sql_string, (status, int(increment_attempts), partition_date, step)
+        sql_string,
+        (
+            status,
+            int(increment_attempts),
+            partition_date,
+            step,
+        ),
     )
