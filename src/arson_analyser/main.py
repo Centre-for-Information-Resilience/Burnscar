@@ -1,8 +1,9 @@
 import datetime
 import logging
 
+from .analyser.validate import FireDetection, FIRMSValidator
 from .config import Config
-from .pipeline import collect
+from .pipeline.collect import collect
 from .pipeline.sql import Query, QueryLoader
 from .storage.duckdb import DuckDBStorage
 
@@ -13,9 +14,7 @@ def run(
     config: Config, country_id: str, start_date: datetime.date, end_date: datetime.date
 ):
     # collect
-    collect.collect(
-        config.api_key_nasa, config.path_data, country_id, start_date, end_date
-    )
+    collect(config.api_key_nasa, config.path_data, country_id, start_date, end_date)
 
     # setup storage
     storage = DuckDBStorage(config.path_duckdb, ["spatial"])
@@ -26,27 +25,25 @@ def run(
 
     with storage:
         # create tables
-        path_data_raw = str(config.path_data / "raw/*.parquet")
-        query = query_loader.load_query("create_raw_data")
-        query.parameters = {"path_raw_data": path_data_raw}
+        path_raw_data = str(config.path_data / "raw/*.parquet")
+        query = query_loader.load_query("create_raw_data").with_parameters(
+            path_raw_data=path_raw_data
+        )
         storage.execute(query)
 
         query = query_loader.load_query("create_firms")
         storage.execute(query)
 
-        query = query_loader.load_query("create_areas_whitelist")
+        query = query_loader.load_query("create_areas_include")
         storage.execute(query)
 
         query = query_loader.load_query("create_firms_joined")
         storage.execute(query)
 
-        # some stats
-        logger.info(storage.execute(raw_data_size).show())
-        # logger.info(storage.execute(filtered_size).show())
-
         # ingest
-        query = query_loader.load_query("insert_raw_data")
-        query.parameters = {"path_raw_data": path_data_raw}
+        query = query_loader.load_query("insert_raw_data").with_parameters(
+            path_raw_data=path_raw_data
+        )
         storage.execute(query)
 
         # process
@@ -54,11 +51,10 @@ def run(
         query = query_loader.load_query("insert_firms")
         storage.execute(query)
 
-        # load whitelist
-
-        query = query_loader.load_query("insert_areas_whitelist")
-        query.parameters = {"path_areas_whitelist": str(config.path_areas_whitelist)}
-        storage.execute(query)
+        # load includes
+        query = query_loader.load_query("insert_areas_include")
+        for file in config.path_areas_include.glob("*.gpkg"):
+            storage.execute(query.with_parameters(path_areas_include=str(file)))
 
         # spatial filter
         query = query_loader.load_query("insert_firms_joined")
@@ -67,6 +63,19 @@ def run(
         logger.info(storage.execute(raw_data_size).show())
         logger.info(storage.execute(joined_size).show())
         logger.info(storage.conn.sql("select * from firms_joined limit 5"))
+        logger.info(storage.conn.sql("select count(*) from areas_include"))
+
         # cluster
+        query = query_loader.load_query("merge_events").with_parameters(max_date_gap=2)
+        events = storage.execute(query)
+        logger.info(events.show())
 
         # analyse
+        validator = FIRMSValidator(config.ee_project)
+        query = query_loader.load_query("select_firms_analysis")
+        events = storage.execute(query)
+        for event in events.fetchmany(10):
+            data = dict(zip(events.columns, event))
+            detection = FireDetection(**data)
+            logger.info(f"Validating: {detection}")
+            validator.validate(detection)

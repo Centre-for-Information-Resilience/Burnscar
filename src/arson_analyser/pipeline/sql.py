@@ -1,4 +1,5 @@
 import re
+from copy import deepcopy
 from pathlib import Path
 
 from pydantic import BaseModel, Field
@@ -10,8 +11,13 @@ class Query(BaseModel):
     parameter_names: list[str] = Field(default_factory=list)
     parameters: dict[str, str] = Field(default_factory=dict)
 
+    def with_parameters(self, **kwargs):
+        new_query = deepcopy(self)
+        new_query.parameters = kwargs
+        return new_query
+
     def __str__(self) -> str:
-        return f"Query({self.name}, {self.parameter_names})"
+        return f"Query({self.name}, {self.parameters})"
 
 
 class QueryLoader:

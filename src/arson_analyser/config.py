@@ -10,4 +10,10 @@ class Config(BaseSettings):
     path_data: Path = Path("data")
     path_duckdb: Path = Path("duckdb")
     path_queries: Path = Path(__file__).parent / "pipeline" / "queries"
-    path_areas_whitelist: Path = Path("geo/urban_areas.gpkg")
+    path_areas_include: Path = Path("geo/include")
+
+    # Geo
+    crs: str = "EPSG:4326"
+
+    # google earth engine
+    ee_project: str = "cir-arson-analyser"

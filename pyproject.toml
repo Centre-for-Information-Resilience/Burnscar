@@ -34,4 +34,5 @@ dev = [
     "pandas-stubs>=2.2.3.250308",
     "pytest>=8.3.5",
     "ruff>=0.9.10",
+    "types-shapely>=2.0.0.20250202",
 ]
