@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from time import perf_counter
 
 import duckdb
 
@@ -27,9 +28,18 @@ class DuckDBStorage:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
 
-    def execute(self, query: Query):
-        logger.info(f"Executing: {query}")
+    def execute(self, query: Query, silent: bool = False):
+        if not silent:
+            start = perf_counter()
+            logger.info(f"Executing: {query}")
+
         assert all(k in query.parameters for k in query.parameter_names), (
             f"not all parameters present: {query.parameter_names}"
         )
-        return self.conn.sql(query.query, params=query.parameters)
+        result = self.conn.sql(query.query, params=query.parameters)
+
+        if not silent:
+            duration = perf_counter() - start
+            logger.info(f"Query took: {round(duration, 2)}s")
+
+        return result
