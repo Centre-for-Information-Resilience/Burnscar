@@ -10,7 +10,11 @@ class Config(BaseSettings):
     path_data: Path = Path("data")
     path_duckdb: Path = Path("duckdb")
     path_queries: Path = Path(__file__).parent / "pipeline" / "queries"
+
+    # Geo data
     path_areas_include: Path = Path("geo/include")
+    path_gadm: Path = Path("geo/gadm")
+    path_settlements: Path = Path("geo/settlements/settlements.gpkg")
 
     # Geo
     crs: str = "EPSG:4326"

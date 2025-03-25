@@ -15,6 +15,7 @@ from .schema import NASARecord
 T = TypeVar("T", bound=BaseModel)
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
 
 client = httpx.Client(timeout=60)
 
@@ -40,7 +41,7 @@ class RateLimits(BaseModel):
         self.used = response_data["current_transactions"]
         self.timeout = response_data["transaction_interval"]
 
-        logger.info(f"Rate limits: {self}")
+        logger.debug(f"Rate limits: {self}")
 
     def __str__(self):
         return f"{self.used}/{self.limit} ({self.timeout})"
@@ -71,13 +72,13 @@ class NASAFetcher:
         # wait for enough available transactions in our rate limit
         # NASA uses some sort of rolling window for rate limits
         while self.rate_limits.remaining < 30:
-            logger.info(
+            logger.debug(
                 f"Rate limit exceeded, waiting for 10 seconds. {self.rate_limits}"
             )
             time.sleep(10)
             self.rate_limits.update()
 
-        logger.info(f"Fetching data for {country_id} on {date}")
+        logger.debug(f"Fetching data for {country_id} on {date}")
 
         url = (
             self.base_url

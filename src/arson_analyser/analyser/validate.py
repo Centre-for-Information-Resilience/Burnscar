@@ -1,8 +1,13 @@
 import datetime
+import logging
+from typing import Generator
 
 import ee
 from pydantic import BaseModel, field_validator
 from shapely import Geometry, Point, Polygon, from_wkb
+from tqdm import tqdm
+
+logger = logging.getLogger(__name__)
 
 
 class FireDetection(BaseModel):
@@ -19,11 +24,29 @@ class FireDetection(BaseModel):
         return from_wkb(v)
 
 
+class ValidationImages(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
+
+    before: ee.image.Image
+    after: ee.image.Image
+    burnt_area: ee.image.Image
+
+
 class ValidationResult(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
+
+    firms_id: int
     burn_scar_detected: bool = False
     burnt_pixel_count: int = 0
     burnt_building_count: int = 0
+    burnt_buildings: ee.featurecollection.FeatureCollection | None = None
 
+    # imagery
+    images: ValidationImages | None = None
+
+    # meta
     no_data: bool = False
     too_cloudy: bool = False
 
@@ -43,14 +66,38 @@ class FIRMSValidator:
             "COPERNICUS/S2_SR_HARMONIZED"
         ).filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 10))
 
+    def validate_many(
+        self,
+        detections: list[FireDetection],
+        buffer_distance: int = 1000,
+        days_around: int = 30,
+        max_cloudy_percentage: int = 20,
+        burnt_pixel_count_threshold: int = 10,
+        nbr_after_lte: float = -0.10,
+        nbr_difference_limit: float = 0.15,
+    ) -> Generator[ValidationResult, None, None]:
+        for detection in tqdm(detections, "Validating FIRMS detections"):
+            yield self.validate(
+                detection=detection,
+                buffer_distance=buffer_distance,
+                days_around=days_around,
+                max_cloudy_percentage=max_cloudy_percentage,
+                burnt_pixel_count_threshold=burnt_pixel_count_threshold,
+                nbr_after_lte=nbr_after_lte,
+                nbr_difference_limit=nbr_difference_limit,
+            )
+
     def validate(
         self,
         detection: FireDetection,
         buffer_distance: int = 1000,
         days_around: int = 30,
         max_cloudy_percentage: int = 20,
+        burnt_pixel_count_threshold: int = 10,
+        nbr_after_lte: float = -0.10,
+        nbr_difference_limit: float = 0.15,
     ) -> ValidationResult:
-        result = ValidationResult()
+        result = ValidationResult(firms_id=detection.id)
 
         ee_point = ee.Geometry.Point(detection.geom.x, detection.geom.y)
 
@@ -87,10 +134,11 @@ class FIRMSValidator:
             result.too_cloudy = True
             return result
 
-        # main validation logic starts here
+        # get nearest before and after image
         before, after = self.get_nearest_surrounding_dates(
             detection.acq_date, image_dates
         )
+
         before_image = (
             s2.filterDate(str(before), str(before + datetime.timedelta(days=1)))
             .first()
@@ -103,18 +151,65 @@ class FIRMSValidator:
             .clip(ee_aoi_bounds)
         )
 
+        # add Normalized Burn Ratio (NBR) to images
         before_image = self.add_NBR(before_image)
         after_image = self.add_NBR(after_image)
 
+        # calculate difference in NBR and create a mask using some threshold
         nbr_difference = before_image.select("NBR").subtract(after_image.select("NBR"))
-        after_nbr_limit = -0.10
-        nbr_difference_limit = 0.15
         nbr_mask = nbr_difference.gte(nbr_difference_limit).And(
-            after_image.select("NBR").lte(after_nbr_limit)
+            after_image.select("NBR").lte(nbr_after_lte)
         )
-        nbr_masked = nbr_difference.updateMask(nbr_mask)
 
+        nbr_masked: ee.image.Image = nbr_difference.updateMask(nbr_mask)
+
+        # create vector of burnt areas
+        burnt_area_vector = nbr_mask.reduceToVectors(
+            geometry=ee_aoi_bounds,
+            crs=nbr_masked.projection(),
+            scale=10,
+            geometryType="polygon",
+            eightConnected=False,
+        ).filter(ee.filter.Filter.eq("label", 1))
+
+        # filter buildings in Area of Interest
         buildings = self.buildings.filterBounds(ee_aoi_bounds)
+        spatial_filter = ee.filter.Filter.intersects(
+            leftField=".geo", rightField=".geo", maxError=10
+        )
+
+        # spatially join buildings with burnt area vector
+        burnt_buildings = ee.join.Join.saveAll(matchesKey="label").apply(
+            primary=buildings,
+            secondary=burnt_area_vector,
+            condition=spatial_filter,
+        )
+
+        # count burnt pixels
+        burnt_pixel_count = (
+            nbr_masked.reduceRegion(
+                reducer=ee.reducer.Reducer.count(),
+                geometry=ee_aoi_bounds,
+                scale=10,
+            )
+            .get("NBR")
+            .getInfo()
+        )
+
+        # build the result
+        result.burnt_pixel_count = burnt_pixel_count
+        result.burnt_building_count = burnt_buildings.size().getInfo()
+        result.burnt_buildings = burnt_buildings
+
+        result.images = ValidationImages(
+            before=before_image, after=after_image, burnt_area=nbr_masked
+        )
+
+        # if the number of burnt pixels is above our threshold we set this flag
+        # NOTE: this is quite arbitrary, so it could also be moved to the manual
+        # validation step / post processing so it remains adjustable.
+        if burnt_pixel_count > burnt_pixel_count_threshold:
+            result.burn_scar_detected = True
 
         return result
 

@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS gadm_geom_idx ON gadm USING RTREE (geom);
