@@ -36,8 +36,8 @@ CREATE OR REPLACE TABLE clustered_events AS (
                 ) AS event_id
             FROM clusters
         ) -- Step 3: Group events per area & summarize
-        SELECT event_id::INTEGER as event_no,
-            area_include_id,
+        SELECT area_include_id,
+            event_id::INTEGER as event_no,
             MIN(acq_date) AS start_date,
             MAX(acq_date) AS end_date,
             AVG(burn_scar_detected::INTEGER) as burn_scar_detected,

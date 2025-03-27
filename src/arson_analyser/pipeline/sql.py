@@ -11,7 +11,7 @@ class Query(BaseModel):
     parameter_names: list[str] = Field(default_factory=list)
     parameters: dict[str, str] = Field(default_factory=dict)
 
-    def with_parameters(self, **kwargs):
+    def params(self, **kwargs):
         new_query = deepcopy(self)
         new_query.parameters = kwargs
         return new_query
@@ -24,7 +24,7 @@ class QueryLoader:
     def __init__(self, queries_path: Path):
         self.queries_path = queries_path
 
-    def load_query(self, name: str) -> Query:
+    def load(self, name: str) -> Query:
         path = self.queries_path / f"{name}.sql"
         sql_string = path.read_text()
         params = re.findall(r"\$([A-z_]+)", sql_string)
@@ -34,5 +34,5 @@ class QueryLoader:
 
 if __name__ == "__main__":
     loader = QueryLoader(Path("src/arson_analyser/pipeline/queries"))
-    q = loader.load_query("create_firms")
+    q = loader.load("create_firms")
     print(q)

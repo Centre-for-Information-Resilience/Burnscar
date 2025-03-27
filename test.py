@@ -1,6 +1,5 @@
 import datetime
 import logging
-from time import perf_counter
 
 from arson_analyser.config import Config
 from arson_analyser.main import run
@@ -12,7 +11,6 @@ logging.basicConfig(level=logging.INFO)
 if __name__ == "__main__":
     config = Config()
     storage = DuckDBStorage(config.path_duckdb, extensions=["spatial"])
-    start = perf_counter()
 
     run(
         config,
@@ -21,5 +19,3 @@ if __name__ == "__main__":
         datetime.date(2025, 1, 1),
         datetime.date(2025, 1, 30),
     )
-
-    print(perf_counter() - start)
