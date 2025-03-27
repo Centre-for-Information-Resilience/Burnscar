@@ -7,7 +7,7 @@ from ..fetchers.nasa.fetcher import NASAFetcher
 from ..utils import date_range
 
 
-def collect(
+def fetch_nasa_data(
     api_key: str,
     data_path: Path,
     country_id: str,

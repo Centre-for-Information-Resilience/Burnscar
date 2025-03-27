@@ -5,6 +5,10 @@ WITH distances AS (
     FROM validation_results AS v
         JOIN firms as f ON v.firms_id = f.id
         CROSS JOIN settlements AS s
+    WHERE f.id NOT IN (
+            SELECT DISTINCT firms_id
+            FROM nearest_settlements
+        )
 ),
 ranked AS (
     SELECT *,
@@ -14,6 +18,7 @@ ranked AS (
         ) AS rn
     FROM distances
 )
+INSERT INTO nearest_settlements
 SELECT firms_id,
     settlement_name
 FROM ranked

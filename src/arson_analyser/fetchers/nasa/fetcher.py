@@ -65,12 +65,12 @@ class NASAFetcher:
         self.out_path = self.data_path / "raw"
 
         self.rate_limits = RateLimits(api_key=api_key)
-        self.rate_limits.update()
 
     @retry
     def _fetch_raw(self, country_id: str, date: datetime.date, satellite: str) -> str:
         # wait for enough available transactions in our rate limit
         # NASA uses some sort of rolling window for rate limits
+        self.rate_limits.update()
         while self.rate_limits.remaining < 30:
             logger.debug(
                 f"Rate limit exceeded, waiting for 10 seconds. {self.rate_limits}"
@@ -115,7 +115,6 @@ class NASAFetcher:
         parsed_data = []
         for satellite in satellites or self.satellites:
             data = self._fetch_raw(country_id, date, satellite)
-            self.rate_limits.update()
             parsed_data += self.parse(data)
 
         return parsed_data

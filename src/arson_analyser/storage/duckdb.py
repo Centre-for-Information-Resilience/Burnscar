@@ -34,7 +34,7 @@ class DuckDBStorage:
             logger.info(f"Executing: {query}")
 
         assert all(k in query.parameters for k in query.parameter_names), (
-            f"not all parameters present: {query.parameter_names}"
+            f"Not all parameters present: {query.parameter_names}. Given: {query.parameters}"
         )
         result = self.conn.sql(query.query, params=query.parameters)
 
@@ -43,3 +43,7 @@ class DuckDBStorage:
             logger.info(f"Query took: {round(duration, 2)}s")
 
         return result
+
+    def execute_all(self, queries: list[Query], silent=False):
+        for query in queries:
+            self.execute(query, silent)

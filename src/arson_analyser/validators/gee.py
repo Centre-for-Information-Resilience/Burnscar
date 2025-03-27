@@ -1,27 +1,12 @@
 import datetime
 import logging
-from typing import Generator
 
 import ee
-from pydantic import BaseModel, field_validator
-from shapely import Geometry, Point, Polygon, from_wkb
-from tqdm import tqdm
+from pydantic import BaseModel
+
+from .models import FIRMSDetection
 
 logger = logging.getLogger(__name__)
-
-
-class FireDetection(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-
-    id: int
-    acq_date: datetime.date
-    geom: Point
-    area_include_geom: Polygon
-
-    @field_validator("geom", "area_include_geom", mode="before")
-    def geom_validator(cls, v) -> Geometry:
-        return from_wkb(v)
 
 
 class ValidationImages(BaseModel):
@@ -51,7 +36,7 @@ class ValidationResult(BaseModel):
     too_cloudy: bool = False
 
 
-class FIRMSValidator:
+class GEEValidator:
     def __init__(self, project: str):
         ee.Authenticate(auth_mode="gcloud")
         ee.Initialize(project=project)
@@ -66,30 +51,9 @@ class FIRMSValidator:
             "COPERNICUS/S2_SR_HARMONIZED"
         ).filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 10))
 
-    def validate_many(
-        self,
-        detections: list[FireDetection],
-        buffer_distance: int = 1000,
-        days_around: int = 30,
-        max_cloudy_percentage: int = 20,
-        burnt_pixel_count_threshold: int = 10,
-        nbr_after_lte: float = -0.10,
-        nbr_difference_limit: float = 0.15,
-    ) -> Generator[ValidationResult, None, None]:
-        for detection in tqdm(detections, "Validating FIRMS detections"):
-            yield self.validate(
-                detection=detection,
-                buffer_distance=buffer_distance,
-                days_around=days_around,
-                max_cloudy_percentage=max_cloudy_percentage,
-                burnt_pixel_count_threshold=burnt_pixel_count_threshold,
-                nbr_after_lte=nbr_after_lte,
-                nbr_difference_limit=nbr_difference_limit,
-            )
-
     def validate(
         self,
-        detection: FireDetection,
+        detection: FIRMSDetection,
         buffer_distance: int = 1000,
         days_around: int = 30,
         max_cloudy_percentage: int = 20,
@@ -121,7 +85,7 @@ class FIRMSValidator:
         image_dates = self.get_image_dates(image_collection=s2)
 
         # we stop early when there is no data from before and after the fire
-        if not min(image_dates) < detection.acq_date < max(image_dates):
+        if not self.imagery_available(image_dates, detection.acq_date):
             result.no_data = True
             return result
 
@@ -130,7 +94,7 @@ class FIRMSValidator:
         image_dates = self.get_image_dates(image_collection=s2)
 
         # we also stop early when available imagery is too cloudy
-        if not min(image_dates) < detection.acq_date < max(image_dates):
+        if not self.imagery_available(image_dates, detection.acq_date):
             result.too_cloudy = True
             return result
 
@@ -220,6 +184,14 @@ class FIRMSValidator:
         image_dates = image_collection.aggregate_array("system:time_start").getInfo()
         return list(
             map(lambda ts: datetime.date.fromtimestamp(ts / 1000.0), image_dates)
+        )
+
+    @staticmethod
+    def imagery_available(
+        image_dates: list[datetime.date], target_date: datetime.date
+    ) -> bool:
+        return (not len(image_dates) == 0) and (
+            min(image_dates) < target_date < max(image_dates)
         )
 
     @staticmethod
