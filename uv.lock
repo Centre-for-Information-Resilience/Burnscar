@@ -44,6 +44,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
+    { name = "rich" },
     { name = "shapely" },
     { name = "tqdm" },
     { name = "typer" },
@@ -56,6 +57,7 @@ dev = [
     { name = "pytest" },
     { name = "ruff" },
     { name = "types-shapely" },
+    { name = "types-tqdm" },
 ]
 
 [package.metadata]
@@ -69,6 +71,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "pydantic-settings", specifier = ">=2.8.1" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "rich", specifier = ">=13.9.4" },
     { name = "shapely", specifier = ">=2.0.7" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "typer", specifier = ">=0.15.2" },
@@ -81,6 +84,7 @@ dev = [
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "ruff", specifier = ">=0.9.10" },
     { name = "types-shapely", specifier = ">=2.0.0.20250202" },
+    { name = "types-tqdm", specifier = ">=4.67.0.20250319" },
 ]
 
 [[package]]
@@ -1064,6 +1068,18 @@ wheels = [
 ]
 
 [[package]]
+name = "types-requests"
+version = "2.32.0.20250328"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/00/7d/eb174f74e3f5634eaacb38031bbe467dfe2e545bc255e5c90096ec46bc46/types_requests-2.32.0.20250328.tar.gz", hash = "sha256:c9e67228ea103bd811c96984fac36ed2ae8da87a36a633964a21f199d60baf32", size = 22995 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cc/15/3700282a9d4ea3b37044264d3e4d1b1f0095a4ebf860a99914fd544e3be3/types_requests-2.32.0.20250328-py3-none-any.whl", hash = "sha256:72ff80f84b15eb3aa7a8e2625fffb6a93f2ad5a0c20215fc1dcfa61117bcb2a2", size = 20663 },
+]
+
+[[package]]
 name = "types-shapely"
 version = "2.0.0.20250202"
 source = { registry = "https://pypi.org/simple" }
@@ -1073,6 +1089,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/74/63/55275685174cc9facf047bfe96e4003d456801fdb8be3c788099703fc75a/types_shapely-2.0.0.20250202.tar.gz", hash = "sha256:97d547ca421cd01c59b20e73f501b92867d76cb40d626fa5851ac66d93720821", size = 25032 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/92/fa/80c289045de65e6867d0a2dda9680b688f144e7e0351bedf9788e29b1f59/types_shapely-2.0.0.20250202-py3-none-any.whl", hash = "sha256:ae550eb03bfc9c4e431b30c494c7a4c3c84926d10887e641eff05bb0bde3dee6", size = 36371 },
+]
+
+[[package]]
+name = "types-tqdm"
+version = "4.67.0.20250319"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "types-requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ea/67/0472ea7fc099eec5feb50d338190c3cd85e9cdc2cd0eefb0691c0ca1d80e/types_tqdm-4.67.0.20250319.tar.gz", hash = "sha256:ae947a64bd8d7ed7b7d2b7369df05f9181f847ec2828fdc8a2deb0bb8701adaa", size = 17195 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/68/44/e7621dd970476f25ef608a19b1ef1296deb9a8d8247adbc63cd503ed94f2/types_tqdm-4.67.0.20250319-py3-none-any.whl", hash = "sha256:8705ef0dd431586e5ea6e010e15b73389b09bcc18186e8c1f530a14dfaa30e09", size = 24285 },
 ]
 
 [[package]]
