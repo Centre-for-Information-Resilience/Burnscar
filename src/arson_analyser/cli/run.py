@@ -3,7 +3,7 @@ import datetime
 import typer
 
 from ..config import Config
-from ..main import run
+from ..pipeline.main import run
 
 app = typer.Typer()
 config = Config()
@@ -11,19 +11,19 @@ config = Config()
 
 @app.command()
 def full(
-    country_id: str = typer.Option("SDN"),
-    gadm_level: int = typer.Option(3),
-    start_date: datetime.date = typer.Option(...),
-    end_date: datetime.date = typer.Option(
-        datetime.date.today() - datetime.timedelta(days=5)
-    ),
+    end_date: str = typer.Option(str(datetime.date.today())),
 ):
+    latest_end_date = datetime.date.today() - datetime.timedelta(
+        days=config.max_date_gap
+    )
+    if datetime.date.fromisoformat(end_date) > latest_end_date:
+        end_date = str(latest_end_date)
+
+    typer.echo(f"Running for {config.country_id}, {config.start_date} - {end_date}")
+
     run(
         config=config,
-        country_id=country_id,
-        gadm_level=gadm_level,
-        start_date=start_date,
-        end_date=end_date,
+        end_date=datetime.date.fromisoformat(end_date),
     )
 
 

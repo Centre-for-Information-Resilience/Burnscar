@@ -5,11 +5,12 @@ from time import perf_counter
 import duckdb
 
 from ..pipeline.sql import Query
+from .base import BaseStorage
 
 logger = logging.getLogger(__name__)
 
 
-class DuckDBStorage:
+class DuckDBStorage(BaseStorage):
     def __init__(self, path: Path, extensions: list[str]):
         self.path = path / "data.duckdb"
         self.extensions = extensions
@@ -28,7 +29,7 @@ class DuckDBStorage:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.close()
 
-    def execute(self, query: Query, silent: bool = False):
+    def execute(self, query: Query, silent: bool = False) -> duckdb.DuckDBPyRelation:
         if not silent:
             start = perf_counter()
             logger.info(f"Executing: {query}")
@@ -43,7 +44,3 @@ class DuckDBStorage:
             logger.info(f"Query took: {round(duration, 2)}s")
 
         return result
-
-    def execute_all(self, queries: list[Query], silent=False):
-        for query in queries:
-            self.execute(query, silent)

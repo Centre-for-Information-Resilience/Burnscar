@@ -4,7 +4,8 @@ import logging
 import ee
 from pydantic import BaseModel
 
-from .models import FIRMSDetection
+from ..models import FireDetection
+from ..utils import expect_type
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +54,7 @@ class GEEValidator:
 
     def validate(
         self,
-        detection: FIRMSDetection,
+        detection: FireDetection,
         buffer_distance: int = 1000,
         days_around: int = 30,
         max_cloudy_percentage: int = 20,
@@ -75,8 +76,8 @@ class GEEValidator:
 
         # fitler collections
         date_window = datetime.timedelta(days=days_around)
-        start_date = str(detection.acq_date - date_window)
-        end_date = str(detection.acq_date + date_window)
+        start_date = str(detection.date - date_window)
+        end_date = str(detection.date + date_window)
 
         s2: ee.imagecollection.ImageCollection = self.s2.filterDate(
             start_date, end_date
@@ -85,7 +86,7 @@ class GEEValidator:
         image_dates = self.get_image_dates(image_collection=s2)
 
         # we stop early when there is no data from before and after the fire
-        if not self.imagery_available(image_dates, detection.acq_date):
+        if not self.imagery_available(image_dates, detection.date):
             result.no_data = True
             return result
 
@@ -94,14 +95,12 @@ class GEEValidator:
         image_dates = self.get_image_dates(image_collection=s2)
 
         # we also stop early when available imagery is too cloudy
-        if not self.imagery_available(image_dates, detection.acq_date):
+        if not self.imagery_available(image_dates, detection.date):
             result.too_cloudy = True
             return result
 
         # get nearest before and after image
-        before, after = self.get_nearest_surrounding_dates(
-            detection.acq_date, image_dates
-        )
+        before, after = self.get_nearest_surrounding_dates(detection.date, image_dates)
 
         before_image = (
             s2.filterDate(str(before), str(before + datetime.timedelta(days=1)))
@@ -148,6 +147,8 @@ class GEEValidator:
             secondary=burnt_area_vector,
             condition=spatial_filter,
         )
+        burnt_building_count = burnt_buildings.size().getInfo()
+        burnt_building_count = expect_type(burnt_building_count, int, 0)
 
         # count burnt pixels
         burnt_pixel_count = (
@@ -159,10 +160,11 @@ class GEEValidator:
             .get("NBR")
             .getInfo()
         )
+        burnt_pixel_count = expect_type(burnt_pixel_count, int, 0)
 
         # build the result
         result.burnt_pixel_count = burnt_pixel_count
-        result.burnt_building_count = burnt_buildings.size().getInfo()
+        result.burnt_building_count = burnt_building_count
         result.burnt_buildings = burnt_buildings
 
         result.images = ValidationImages(
@@ -182,6 +184,7 @@ class GEEValidator:
         image_collection: ee.imagecollection.ImageCollection,
     ) -> list[datetime.date]:
         image_dates = image_collection.aggregate_array("system:time_start").getInfo()
+        image_dates = expect_type(image_dates, list, [])
         return list(
             map(lambda ts: datetime.date.fromtimestamp(ts / 1000.0), image_dates)
         )

@@ -1,6 +1,8 @@
 import datetime
 from urllib.parse import quote, urlencode
 
+import pandas as pd
+
 
 def copernicus(
     latitude: float,
@@ -43,6 +45,39 @@ def whopostedwhat(
     query = dict(q=keyword, filters=filters, epa="FILTERS")
 
     return base_url + urlencode(query)
+
+
+def add_links(
+    output: pd.DataFrame,
+    date_window_size=5,
+    keyword_cols=["settlement_name", "NAME_1", "NAME_2", "NAME_3"],
+) -> pd.DataFrame:
+    rows = []
+    for _, row in output.iterrows():
+        start_date = (
+            row["acq_date"] - datetime.timedelta(days=date_window_size)
+        ).date()
+        end_date = (row["acq_date"] + datetime.timedelta(days=date_window_size)).date()
+
+        links = {
+            "firms_id": row["firms_id"],
+        }
+
+        links["link_copernicus"] = copernicus(
+            row["latitude"], row["longitude"], start_date, end_date
+        )
+
+        for keyword_col in keyword_cols:
+            links[f"link_{keyword_col}_x"] = x(row[keyword_col], start_date, end_date)
+            links[f"link_{keyword_col}_whopostedwhat"] = whopostedwhat(
+                row[keyword_col], start_date, end_date
+            )
+
+        rows.append(links)
+
+    links_df = pd.DataFrame.from_records(rows).set_index("firms_id")
+    output = output.join(links_df)
+    return output
 
 
 if __name__ == "__main__":

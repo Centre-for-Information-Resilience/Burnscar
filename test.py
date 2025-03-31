@@ -2,7 +2,7 @@ import datetime
 import logging
 
 from arson_analyser.config import Config
-from arson_analyser.main import run
+from arson_analyser.pipeline.main import run
 from arson_analyser.storage.duckdb import DuckDBStorage
 
 logging.basicConfig(level=logging.INFO)

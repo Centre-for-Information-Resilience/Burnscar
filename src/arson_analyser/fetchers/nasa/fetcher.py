@@ -62,7 +62,7 @@ class NASAFetcher:
         self.instrument = instrument
         self.data_version = data_version
         self.data_path = data_path
-        self.out_path = self.data_path / "raw"
+        self.out_path = self.data_path
 
         self.rate_limits = RateLimits(api_key=api_key)
 
