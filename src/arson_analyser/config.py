@@ -38,7 +38,7 @@ class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="__")
 
     # Credentials
-    api_key_nasa: str = Field("", min_length=32, max_length=32)
+    api_key_nasa: str = Field(..., min_length=32, max_length=32)
 
     # google earth engine
     ee_project: str = "cir-arson-analyser"
@@ -50,7 +50,7 @@ class Config(BaseSettings):
     paths: Paths = Paths()
 
     # Project settings
-    country_id: str = Field("XXX", min_length=3, max_length=3)
+    country_id: str = Field(..., min_length=3, max_length=3)
     gadm_level: int = Field(3, ge=1, le=3)
     start_date: datetime.date = Field(datetime.date(2025, 1, 1))
 

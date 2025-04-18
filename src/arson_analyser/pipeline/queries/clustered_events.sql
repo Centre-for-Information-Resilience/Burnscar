@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE clustered_events AS (
+CREATE VIEW IF NOT EXISTS AS (
         WITH clusters AS (
             -- Step 1: Compute date differences
             SELECT id,
