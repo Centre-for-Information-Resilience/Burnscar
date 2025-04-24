@@ -6,7 +6,7 @@ gateways:
       # https://sqlmesh.readthedocs.io/en/stable/integrations/engines/duckdb/#connection-options
       type: duckdb
       database: db.db
-      concurrent_tasks: 4
+      # concurrent_tasks: 4
       # register_comments: True
       # pre_ping: False
       pretty_sql: True
@@ -21,11 +21,12 @@ default_gateway: duckdb
 
 model_defaults:
   dialect: duckdb
-  start: 2025-04-01
+  start: 2025-03-18
 
 variables:
   # settings
   ee_project: "cir-arson-analyser"
+  ee_concurrency: 50 # max number of threads used for fetching data from gee. 50 uses ~1.5GB of RAM
   country_id: "SDN"
 
   analyse_after_days: 11 # allow for at least 2 passes of sentinel 2

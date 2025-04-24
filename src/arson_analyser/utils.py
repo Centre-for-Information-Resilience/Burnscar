@@ -1,7 +1,7 @@
 import datetime
 import logging
 import time
-from typing import Any, Type, TypeVar
+from typing import Any, Callable, Type, TypeVar
 
 from rich.progress import (
     BarColumn,
@@ -38,6 +38,19 @@ def retry(func, retries: int = 3, base: int = 2):
         raise ValueError("Failed after retries")
 
     return wrapper
+
+
+def timeit(label: str):
+    def decorator(func: Callable):
+        def wrapper(*args, **kwargs):
+            t0 = time.time()
+            result = func(*args, **kwargs)
+            print(f"{label:<40} took: {time.time() - t0:.2f}s")
+            return result
+
+        return wrapper
+
+    return decorator
 
 
 def date_range(

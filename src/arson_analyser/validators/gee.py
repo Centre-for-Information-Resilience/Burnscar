@@ -1,5 +1,7 @@
 import datetime
 import logging
+import os
+import typing as t
 
 import ee
 from pydantic import BaseModel
@@ -40,8 +42,9 @@ class ValidationResult(BaseModel):
 
 class GEEValidator:
     def __init__(self, project: str):
-        ee.Authenticate(auth_mode="gcloud")
-        ee.Initialize(project=project)
+        api_key = os.getenv("API_KEY_EARTH_ENGINE")
+        assert api_key, "API_KEY_EARTH_ENGINE must be set in your .env file"
+        ee.Initialize(project=project, cloud_api_key=api_key)
 
         self._define_collections()
 
@@ -52,6 +55,32 @@ class GEEValidator:
         self.s2: ee.imagecollection.ImageCollection = ee.ImageCollection(
             "COPERNICUS/S2_SR_HARMONIZED"
         ).filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 10))
+
+    def validate_many(
+        self,
+        detections: list[FireDetection],
+        validation_params: dict,
+        max_workers: int = 10,
+    ) -> t.Generator[ValidationResult, None, None]:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        def safe_validate(detection: FireDetection) -> ValidationResult:
+            try:
+                return self.validate(detection, **validation_params)
+            except Exception as e:
+                logger.error(
+                    f"Validation failed for FIRMS ID {detection.firms_id}: {e}"
+                )
+                return ValidationResult(
+                    firms_id=detection.firms_id,
+                    acq_date=detection.acq_date,
+                    no_data=True,
+                )
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(safe_validate, det): det for det in detections}
+            for future in as_completed(futures):
+                yield future.result()
 
     def validate(
         self,
