@@ -24,6 +24,7 @@ class ValidationResult(BaseModel):
         arbitrary_types_allowed = True
 
     firms_id: int
+    acq_date: datetime.date
     burn_scar_detected: bool = False
     burnt_pixel_count: int = 0
     burnt_building_count: int = 0
@@ -62,7 +63,9 @@ class GEEValidator:
         nbr_after_lte: float = -0.10,
         nbr_difference_limit: float = 0.15,
     ) -> ValidationResult:
-        result = ValidationResult(firms_id=detection.id)
+        result = ValidationResult(
+            firms_id=detection.firms_id, acq_date=detection.acq_date
+        )
 
         ee_point = ee.Geometry.Point(detection.geom.x, detection.geom.y)
 
@@ -76,8 +79,8 @@ class GEEValidator:
 
         # fitler collections
         date_window = datetime.timedelta(days=days_around)
-        start_date = str(detection.date - date_window)
-        end_date = str(detection.date + date_window)
+        start_date = str(detection.acq_date - date_window)
+        end_date = str(detection.acq_date + date_window)
 
         s2: ee.imagecollection.ImageCollection = self.s2.filterDate(
             start_date, end_date
@@ -86,7 +89,7 @@ class GEEValidator:
         image_dates = self.get_image_dates(image_collection=s2)
 
         # we stop early when there is no data from before and after the fire
-        if not self.imagery_available(image_dates, detection.date):
+        if not self.imagery_available(image_dates, detection.acq_date):
             result.no_data = True
             return result
 
@@ -95,12 +98,14 @@ class GEEValidator:
         image_dates = self.get_image_dates(image_collection=s2)
 
         # we also stop early when available imagery is too cloudy
-        if not self.imagery_available(image_dates, detection.date):
+        if not self.imagery_available(image_dates, detection.acq_date):
             result.too_cloudy = True
             return result
 
         # get nearest before and after image
-        before, after = self.get_nearest_surrounding_dates(detection.date, image_dates)
+        before, after = self.get_nearest_surrounding_dates(
+            detection.acq_date, image_dates
+        )
 
         before_image = (
             s2.filterDate(str(before), str(before + datetime.timedelta(days=1)))

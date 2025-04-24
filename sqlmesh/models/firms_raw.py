@@ -1,0 +1,78 @@
+import datetime
+import os
+import typing as t
+from pathlib import Path
+
+import pandas as pd
+from dotenv import load_dotenv
+
+from arson_analyser.fetchers.nasa.fetcher import NASAFetcher
+from arson_analyser.utils import date_range
+from sqlmesh import ExecutionContext, model
+from sqlmesh.core.model import ModelKindName
+
+
+@model(
+    name="arson.firms_raw",
+    kind=dict(
+        name=ModelKindName.INCREMENTAL_BY_TIME_RANGE,
+        time_column="acq_date",
+        batch_size=1,
+    ),
+    cron="@daily",
+    grain=("acq_date", "longitude", "latitude"),
+    description="Raw NASA FIRMS data, fetched from the NASA API.",
+    columns={
+        "country_id": "text",
+        "latitude": "double",
+        "longitude": "double",
+        "scan": "double",
+        "track": "double",
+        "acq_date": "date",
+        "acq_time": "time",
+        "satellite": "text",
+        "instrument": "text",
+        "version": "text",
+        "frp": "double",
+        "daynight": "text",
+        "bright_ti4": "double",
+        "bright_ti5": "double",
+        "confidence": "text",
+    },
+)
+def fetch_nasa_data(
+    context: ExecutionContext,
+    start: datetime.datetime,
+    end: datetime.datetime,
+    **kwargs: dict[str, t.Any],
+) -> t.Generator[pd.DataFrame, None, None]:
+    load_dotenv()
+    api_key_nasa = os.environ["API_KEY_NASA"]
+    assert api_key_nasa, "API_KEY_NASA must be set in your .env file"
+
+    output_dir = context.var("path_raw_data")
+    assert output_dir, "Output directory must be set in the context variables"
+    output_dir = Path(output_dir)
+
+    country_id = context.var("country_id")
+    assert country_id, "Country code must be set in the context variables"
+
+    fetcher = NASAFetcher(api_key=api_key_nasa)
+
+    dfs = []
+
+    # one fetch per date
+    dates = date_range(start.date(), end.date())
+
+    for date in dates:
+        data = fetcher.fetch(country_id, date)
+        dfs.append(fetcher.to_dataframe(data))
+
+    # Concatenate all dataframes into one
+    df = pd.concat(dfs, ignore_index=True)
+
+    if df.empty:
+        yield from ()
+
+    else:
+        yield df

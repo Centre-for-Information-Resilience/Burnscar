@@ -33,4 +33,4 @@ def ensure_gadm(path: Path, country_id: str, level: int) -> Path:
 
 
 if __name__ == "__main__":
-    ensure_gadm(Path("geo/topography"), "NLD", 2)
+    ensure_gadm(Path("data/gadm"), "NLD", 2)
