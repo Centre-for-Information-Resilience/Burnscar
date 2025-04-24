@@ -47,7 +47,7 @@ def fetch_nasa_data(
     **kwargs: dict[str, t.Any],
 ) -> t.Generator[pd.DataFrame, None, None]:
     load_dotenv()
-    api_key_nasa = os.environ["API_KEY_NASA"]
+    api_key_nasa = os.getenv("API_KEY_NASA")
     assert api_key_nasa, "API_KEY_NASA must be set in your .env file"
 
     output_dir = context.var("path_raw_data")
