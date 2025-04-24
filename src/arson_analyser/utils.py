@@ -1,7 +1,7 @@
 import datetime
 import logging
 import time
-from typing import Any, Iterable, Type, TypeVar
+from typing import Any, Type, TypeVar
 
 from rich.progress import (
     BarColumn,
@@ -42,11 +42,11 @@ def retry(func, retries: int = 3, base: int = 2):
 
 def date_range(
     start_date: datetime.date, end_date: datetime.date
-) -> Iterable[datetime.date]:
-    return (
+) -> list[datetime.date]:
+    return [
         start_date + datetime.timedelta(days=i)
         for i in range((end_date - start_date).days + 1)
-    )
+    ]
 
 
 def expect_type(obj: Any, expected_type: Type[T], default: T) -> T:

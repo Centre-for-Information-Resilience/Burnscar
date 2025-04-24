@@ -14,6 +14,7 @@ from sqlmesh.core.model import model
         {"in_ex": "include", "path": "../geo/include.gpkg"},
         {"in_ex": "exclude", "path": "../geo/exclude.gpkg"},
     ],
+    columns={"id": "char(32)", "geom": "geometry"},
 )
 def entrypoint(evaluator: MacroEvaluator) -> str | exp.Expression:
     path = evaluator.blueprint_var("path")
@@ -21,7 +22,7 @@ def entrypoint(evaluator: MacroEvaluator) -> str | exp.Expression:
         raise ValueError("Path is required")
 
     if not os.path.exists(path):
-        return "select null as id, null::GEOMETRY as geom limit 0"
+        return "select null as id, null as geom limit 0"
 
     unnested = (
         exp.select("st_makevalid(unnest(st_dump(geom)).geom) as geom")

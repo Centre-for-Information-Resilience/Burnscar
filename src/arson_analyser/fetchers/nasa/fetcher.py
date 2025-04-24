@@ -56,13 +56,10 @@ class NASAFetcher:
         api_key: str,
         instrument: Literal["VIIRS"] = "VIIRS",
         data_version: Literal["URT", "RT", "NRT", "SP"] = "NRT",
-        data_path: Path = Path("data"),
     ):
         self.api_key = api_key
         self.instrument = instrument
         self.data_version = data_version
-        self.data_path = data_path
-        self.out_path = self.data_path
 
         self.rate_limits = RateLimits(api_key=api_key)
 

@@ -6,7 +6,7 @@ gateways:
       # https://sqlmesh.readthedocs.io/en/stable/integrations/engines/duckdb/#connection-options
       type: duckdb
       database: db.db
-      # concurrent_tasks: 1
+      concurrent_tasks: 4
       # register_comments: True
       # pre_ping: False
       pretty_sql: True
@@ -21,10 +21,29 @@ default_gateway: duckdb
 
 model_defaults:
   dialect: duckdb
-  start: 2025-03-31
+  start: 2025-04-01
 
 variables:
-  path_raw_data: ../data/raw/*.parquet
+  # settings
+  ee_project: "cir-arson-analyser"
+  country_id: "SDN"
+
+  analyse_after_days: 11 # allow for at least 2 passes of sentinel 2
+  analyse_until_days: 16
+
+  # validation parameters
+  validation_params:
+    buffer_distance: 1000
+    days_around: 30
+    max_cloudy_percentage: 20
+    burnt_pixel_count_threshold: 10
+    nbr_after_lte: -0.10
+    nbr_difference_limit: 0.15
+
+  clustering_max_date_gap: 2
+  
+  # paths
+  path_raw_data: ../data/raw
   path_geo: ../geo
   path_areas_include: ../geo/include.gpkg
   path_areas_exclude: ../geo/exclude.gpkg
