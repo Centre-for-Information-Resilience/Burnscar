@@ -28,6 +28,7 @@ variables:
   ee_project: "cir-arson-analyser"
   ee_concurrency: 50 # max number of threads used for fetching data from gee. 50 uses ~1.5GB of RAM
   country_id: "SDN"
+  gadm_level: 3
 
   analyse_after_days: 11 # allow for at least 2 passes of sentinel 2
   analyse_until_days: 16
