@@ -1,4 +1,5 @@
 import typing as t
+from pathlib import Path
 
 from arson_analyser.linkgen import add_links
 from sqlmesh import ExecutionContext, model
@@ -8,10 +9,10 @@ from sqlmesh.core.model import ModelKindName
 @model(
     name="arson.output_to_disk",
     kind=ModelKindName.FULL,
-    description="Final output view with added social links",
+    description="Final outputs: output.csv (with added social links), output_clustered.csv (clusters of detections)",
     columns={"firms_id": "int"},
 )
-def fetch_nasa_data(
+def write_outputs_to_disk(
     context: ExecutionContext,
     **kwargs: dict[str, t.Any],
 ) -> t.Generator[None, None, None]:
@@ -26,11 +27,13 @@ def fetch_nasa_data(
     # write to disk
     output_dir = context.var("path_output")
     assert isinstance(output_dir, str), "path_output needs to be defined in config.yaml"
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
 
-    output_with_links_df.to_csv(output_dir + "/firms_output.csv", index=False)
+    output_with_links_df.to_csv(output_path / "firms_output.csv", index=False)
 
     clustered_table = context.resolve_table("arson.firms_clustered")
     clustered_df = context.fetchdf(f"select * from {clustered_table}")
-    clustered_df.to_csv(output_dir + "/output_clustered.csv", index=False)
+    clustered_df.to_csv(output_path / "output_clustered.csv", index=False)
 
     yield from ()
