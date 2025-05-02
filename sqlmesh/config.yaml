@@ -52,4 +52,4 @@ variables:
   path_areas_exclude: ../geo/exclude.gpkg
   path_gadm: ../data/gadm
   path_settlements: ../geo/settlements.gpkg
-  path_output: ../data/output
+  path_output: ../output
