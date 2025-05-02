@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS settlements_geom_idx ON settlements USING RTREE (geom);

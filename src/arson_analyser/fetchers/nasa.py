@@ -2,36 +2,109 @@ import datetime
 import json
 import logging
 import time
+from enum import StrEnum
 from pathlib import Path
 from typing import Iterable, Literal, TypeVar
 
 import httpx
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
-from ...utils import retry
-from .schema import NASARecord
+from ..utils import retry
 
 T = TypeVar("T", bound=BaseModel)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
-client = httpx.Client(timeout=60)
+
+class Satellite(StrEnum):
+    SNPP = "N"
+    NOAA20 = "N20"
+    NOAA21 = "N21"
 
 
-class RateLimits(BaseModel):
-    api_key: str
-    limit: int = 0
-    used: int = 5000
-    timeout: str = "10 minutes"
+class Instrument(StrEnum):
+    VIIRS = "VIIRS"
+
+
+class Confidence(StrEnum):
+    nominal = "n"
+    low = "l"
+    high = "h"
+
+
+class DayNight(StrEnum):
+    day = "D"
+    night = "N"
+
+
+class NASARecord(BaseModel):
+    class Config:
+        frozen = True
+
+    country_id: str
+    latitude: float
+    longitude: float
+    scan: float
+    track: float
+    acq_date: datetime.date
+    acq_time: datetime.time
+    satellite: Satellite
+    instrument: Instrument
+    version: str
+    frp: float
+    daynight: DayNight
+    bright_ti4: float
+    bright_ti5: float
+    confidence: Confidence
+
+    @field_validator("acq_time", mode="before")
+    def parse_time(cls, v):
+        if isinstance(v, int):
+            v_str = f"{v:04d}"  # Pad integer to ensure four digits
+        elif isinstance(v, str):
+            v_str = v.zfill(4)  # Handle strings, pad left zeros
+        else:
+            raise ValueError("Invalid time format")
+
+        hour = int(v_str[:2])
+        minute = int(v_str[2:])
+
+        return datetime.time(hour=hour, minute=minute)
+
+    def __hash__(self):
+        return hash(
+            (
+                self.country_id,
+                self.latitude,
+                self.longitude,
+                self.acq_date,
+                self.acq_time,
+            )
+        )
+
+
+class RateLimits:
+    def __init__(
+        self,
+        client: httpx.Client,
+        api_key: str,
+        timeout: str = "10 minutes",
+    ):
+        self.client = client
+        self.api_key = api_key
+        self.timeout = timeout
+
+        self.limit = 0
+        self.used = 5000
 
     @property
     def remaining(self) -> int:
         return self.limit - self.used
 
     def update(self):
-        response = client.get(
+        response = self.client.get(
             "https://firms.modaps.eosdis.nasa.gov/mapserver/mapkey_status/?MAP_KEY="
             + self.api_key
         )
@@ -61,7 +134,8 @@ class NASAFetcher:
         self.instrument = instrument
         self.data_version = data_version
 
-        self.rate_limits = RateLimits(api_key=api_key)
+        self.client = httpx.Client(timeout=60)
+        self.rate_limits = RateLimits(api_key=api_key, client=self.client)
 
     @retry
     def _fetch_raw(self, country_id: str, date: datetime.date, satellite: str) -> str:
@@ -81,7 +155,7 @@ class NASAFetcher:
             self.base_url
             + f"/{self.api_key}/{self.instrument}_{satellite}_{self.data_version}/{country_id}/1/{date}"
         )
-        response = client.get(url)
+        response = self.client.get(url)
 
         if not response.text.startswith("country_id,latitude,longitude"):
             raise ValueError("Invalid response: " + response.text)

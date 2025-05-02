@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
-from arson_analyser.fetchers.nasa.fetcher import NASAFetcher
+from arson_analyser.fetchers.nasa import NASAFetcher
 from arson_analyser.utils import date_range
 from sqlmesh import ExecutionContext, model
 from sqlmesh.core.model import ModelKindName
