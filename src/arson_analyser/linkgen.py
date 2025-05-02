@@ -50,7 +50,7 @@ def whopostedwhat(
 def add_links(
     output: pd.DataFrame,
     date_window_size=5,
-    keyword_cols=["settlement_name", "NAME_1", "NAME_2", "NAME_3"],
+    keyword_cols=["settlement_name", "gadm_1", "gadm_2", "gadm_3"],
 ) -> pd.DataFrame:
     rows = []
     for _, row in output.iterrows():
@@ -76,7 +76,7 @@ def add_links(
         rows.append(links)
 
     links_df = pd.DataFrame.from_records(rows).set_index("firms_id")
-    output = output.join(links_df)
+    output = output.merge(links_df, on="firms_id")
     return output
 
 
