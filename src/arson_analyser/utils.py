@@ -3,28 +3,9 @@ import logging
 import time
 from typing import Any, Callable, Type, TypeVar
 
-from rich.progress import (
-    BarColumn,
-    MofNCompleteColumn,
-    Progress,
-    SpinnerColumn,
-    TextColumn,
-    TimeElapsedColumn,
-    TimeRemainingColumn,
-)
-
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
-
-progress = Progress(
-    SpinnerColumn(),
-    TimeElapsedColumn(),
-    TextColumn("[progress.description]{task.description}"),
-    BarColumn(),
-    MofNCompleteColumn(),
-    TimeRemainingColumn(),
-)
 
 
 def retry(func, retries: int = 3, base: int = 2):
