@@ -53,3 +53,7 @@ variables:
   path_gadm: ../data/gadm
   path_settlements: ../geo/settlements.gpkg
   path_output: ../output
+
+  paths_areas:
+    include: ../geo/include.gpkg
+    exclude: ../geo/exclude.gpkg

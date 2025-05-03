@@ -11,15 +11,18 @@ from sqlmesh.core.model import model
     is_sql=True,
     kind="FULL",
     blueprints=[
-        {"in_ex": "include", "path": "../geo/include.gpkg"},
-        {"in_ex": "exclude", "path": "../geo/exclude.gpkg"},
+        {"in_ex": "include"},
+        {"in_ex": "exclude"},
     ],
     columns={"id": "char(32)", "geom": "geometry"},
 )
 def entrypoint(evaluator: MacroEvaluator) -> str | exp.Expression:
-    path = evaluator.blueprint_var("path")
-    if not path:
-        raise ValueError("Path is required")
+    areas = evaluator.var("paths_areas")
+    assert isinstance(areas, dict), "areas must be set in config.yaml"
+
+    in_ex = evaluator.blueprint_var("in_ex")
+    assert isinstance(in_ex, str), "in_ex must be set in blueprint"
+    path = areas[in_ex]
 
     if not os.path.exists(path):
         return "select null as id, null as geom limit 0"
