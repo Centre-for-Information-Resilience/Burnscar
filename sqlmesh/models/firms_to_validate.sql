@@ -1,7 +1,10 @@
 MODEL (
   name arson.firms_to_validate,
   kind VIEW,
-  description "FIRMS events pending validation."
+  description "FIRMS events pending validation.",
+  audits (
+    number_of_rows(threshold := 1)
+  )
 );
 
 SELECT

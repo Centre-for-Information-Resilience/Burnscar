@@ -75,7 +75,7 @@ def add_links(
 
         rows.append(links)
 
-    links_df = pd.DataFrame.from_records(rows).set_index("firms_id")
+    links_df = pd.DataFrame.from_records(rows)
     output = output.merge(links_df, on="firms_id")
     return output
 
