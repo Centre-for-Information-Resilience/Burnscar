@@ -6,6 +6,10 @@ MODEL (
   )
 );
 
-
-select * from (@UNION('DISTINCT', arson.firms_validated_try_1, arson.firms_validated_try_2))
-ORDER BY acq_date
+SELECT
+  *
+FROM (
+  @UNION('DISTINCT', @EACH([0, 1, 2], try_ -> arson.firms_validated_@{try_}))
+)
+ORDER BY
+  acq_date

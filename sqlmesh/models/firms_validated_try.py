@@ -8,10 +8,38 @@ from arson_analyser.validators.gee import GEEValidator
 from sqlmesh import ExecutionContext, model
 from sqlmesh.core.model import ModelKindName
 
+COLUMNS = {
+    "firms_id": "int",
+    "acq_date": "date",
+    "burn_scar_detected": "bool",
+    "burnt_pixel_count": "int",
+    "burnt_building_count": "int",
+    "no_data": "bool",
+    "too_cloudy": "bool",
+}
+
+KIND = dict(
+    name=ModelKindName.INCREMENTAL_BY_UNIQUE_KEY,
+    unique_key=("firms_id"),
+    lookback="@validation_lookback",
+    batch_size=7,
+)
+
 
 def validate(
-    context: ExecutionContext, firms_to_validate: pd.DataFrame
+    context: ExecutionContext,
+    start: datetime.datetime,
+    end: datetime.datetime,
+    firms_to_validate_table: str,
 ) -> t.Generator[pd.DataFrame, None, None]:
+    # fetch data
+    firms_to_validate = context.fetchdf(
+        f"""
+        SELECT * FROM {firms_to_validate_table}
+        WHERE acq_date BETWEEN '{start.date()}' AND '{end.date()}'
+        """,
+    )
+
     # set up validator
     ee_project = context.var("ee_project")
     assert ee_project, "GEE project not set in config"
@@ -42,22 +70,25 @@ def validate(
 
 
 @model(
-    name="arson.firms_validated_try_1",
-    kind=dict(
-        name=ModelKindName.INCREMENTAL_BY_UNIQUE_KEY,
-        unique_key=("firms_id"),
-        lookback="@analyse_until_days",
-        batch_size=7,
-    ),
-    columns={
-        "firms_id": "int",
-        "acq_date": "date",
-        "burn_scar_detected": "bool",
-        "burnt_pixel_count": "int",
-        "burnt_building_count": "int",
-        "no_data": "bool",
-        "too_cloudy": "bool",
-    },
+    name="arson.firms_validated_0",
+    kind=KIND,
+    columns=COLUMNS,
+)
+def firms_validated_try_0(
+    context: ExecutionContext,
+    start: datetime.datetime,
+    end: datetime.datetime,
+    **kwargs: dict[str, t.Any],
+) -> t.Generator[pd.DataFrame, None, None]:
+    firms_to_validate_table = context.resolve_table("arson.firms_to_validate_0")
+
+    yield from validate(context, start, end, firms_to_validate_table)
+
+
+@model(
+    name="arson.firms_validated_1",
+    kind=KIND,
+    columns=COLUMNS,
 )
 def firms_validated_try_1(
     context: ExecutionContext,
@@ -65,35 +96,15 @@ def firms_validated_try_1(
     end: datetime.datetime,
     **kwargs: dict[str, t.Any],
 ) -> t.Generator[pd.DataFrame, None, None]:
-    firms_to_validate_table = context.resolve_table("arson.firms_to_validate")
+    firms_to_validate_table = context.resolve_table("arson.firms_to_validate_1")
 
-    firms_to_validate = context.fetchdf(
-        f"""
-        SELECT * FROM {firms_to_validate_table}
-        WHERE acq_date BETWEEN '{start.date()}' AND '{end.date()}'
-        """,
-    )
-
-    yield from validate(context, firms_to_validate)
+    yield from validate(context, start, end, firms_to_validate_table)
 
 
 @model(
-    name="arson.firms_validated_try_2",
-    kind=dict(
-        name=ModelKindName.INCREMENTAL_BY_UNIQUE_KEY,
-        unique_key=("firms_id"),
-        lookback="@analyse_until_days",
-        batch_size=7,
-    ),
-    columns={
-        "firms_id": "int",
-        "acq_date": "date",
-        "burn_scar_detected": "bool",
-        "burnt_pixel_count": "int",
-        "burnt_building_count": "int",
-        "no_data": "bool",
-        "too_cloudy": "bool",
-    },
+    name="arson.firms_validated_2",
+    kind=KIND,
+    columns=COLUMNS,
 )
 def firms_validated_try_2(
     context: ExecutionContext,
@@ -101,13 +112,6 @@ def firms_validated_try_2(
     end: datetime.datetime,
     **kwargs: dict[str, t.Any],
 ) -> t.Generator[pd.DataFrame, None, None]:
-    firms_to_validate_table = context.resolve_table("arson.firms_to_retry")
+    firms_to_validate_table = context.resolve_table("arson.firms_to_validate_2")
 
-    firms_to_validate = context.fetchdf(
-        f"""
-        SELECT * FROM {firms_to_validate_table}
-        WHERE acq_date BETWEEN '{start.date()}' AND '{end.date()}'
-        """,
-    )
-
-    yield from validate(context, firms_to_validate)
+    yield from validate(context, start, end, firms_to_validate_table)
