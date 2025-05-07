@@ -34,7 +34,6 @@ def gadm(
     full_path_gadm = ensure_gadm(
         path=path_gadm,
         country_id=country_id,
-        level=gadm_level,
     )
 
     gadm_levels = [
@@ -47,4 +46,4 @@ def gadm(
         exp.cast(exp.column("GID_0"), "text").as_("country_id"),
         *gadm_levels[:gadm_level],
         exp.cast(exp.column("geom"), "geometry").as_("geom"),
-    ).from_(f"st_read('{full_path_gadm}')")
+    ).from_(f"st_read('{full_path_gadm}', layer='ADM_ADM_{gadm_level}')")
