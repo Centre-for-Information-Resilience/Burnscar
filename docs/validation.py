@@ -26,6 +26,17 @@ def _():
 
 
 @app.cell
+def _():
+    import duckdb
+
+    DATABASE_URL = "sqlmesh/db.db"
+    engine = duckdb.connect(DATABASE_URL, read_only=True)
+    engine.install_extension("spatial")
+    engine.load_extension("spatial")
+    return (engine,)
+
+
+@app.cell
 def _(mo):
     old_df = mo.sql(
         f"""
@@ -59,14 +70,55 @@ def _(date_range, pl):
 
 
 @app.cell
-def _(mo):
+def _(engine, mo):
+    table_names = mo.sql(
+        f"""
+        select name from (show all tables) where schema = 'arson'
+        """,
+        engine=engine
+    )
+    return
+
+
+@app.cell
+def _(arson, engine, mo):
+    firms_to_validate = mo.sql(
+        f"""
+        select firms_id, acq_date, st_y(st_geomfromwkb(geom)) as latitude, st_x(st_geomfromwkb(geom)) as longitude, md5(latitude::text || longitude::text) as id
+        from arson.firms_to_validate
+        """,
+        engine=engine
+    )
+    return (firms_to_validate,)
+
+
+@app.cell
+def _(arson, engine, mo):
+    firms = mo.sql(
+        f"""
+        select
+            acq_date,
+            st_y (geom) as latitude,
+            st_x (geom) as longitude,
+            md5(latitude::text || longitude::text) as id
+        from
+            arson.firms
+        """,
+        engine=engine
+    )
+    return (firms,)
+
+
+@app.cell
+def _(engine, mo):
     new_df = mo.sql(
         f"""
         SELECT
-            *, md5(concat(latitude::text, longitude::text)) as id
+            *, md5(latitude::text || longitude::text) as id
         FROM
             'output/firms_output.csv'
-        """
+        """,
+        engine=engine
     )
     return (new_df,)
 
@@ -89,7 +141,7 @@ def _(alt, date_range_filter, mo, new_df, old_df):
 
 
 @app.cell
-def _(date_range_filter, new_df, old_df):
+def _(date_range_filter, firms, new_df, old_df):
     old = old_df.filter(date_range_filter)
     new = new_df.filter(date_range_filter)
 
@@ -99,7 +151,13 @@ def _(date_range_filter, new_df, old_df):
     diff = old_rows ^ new_rows
     miss = old_rows - new_rows
 
-    diff == miss
+    print("Difference between old and new results:", len(diff))
+    print("Is the difference in results the same as what is missing from the new results?", diff == miss)
+    print(f"Percentage of old points covered: {len(new_rows) / len(old_rows):.1%}")
+    print("Validated using old scripts:", len(old_rows))
+    print("Validated using new scripts:", len(new_rows))
+    print("Missing from raw FIRMS dataset:", len(old_rows - set(firms["id"])))
+    print("Same as missing in new validation?", (old_rows - set(firms["id"])) == diff)
     return miss, new, old
 
 
@@ -144,24 +202,6 @@ def _(comp, pl):
 
 
 @app.cell
-def _(comp, pl):
-    comp.filter(pl.col("gadm_1_match") != True)[["NAME_1", "gadm_1"]]
-    return
-
-
-@app.cell
-def _(comp, pl):
-    comp.filter(pl.col("gadm_2_match") != True)[["NAME_2", "gadm_2"]]
-    return
-
-
-@app.cell
-def _(comp, pl):
-    comp.filter(pl.col("gadm_3_match") != True)[["NAME_3", "gadm_3"]]
-    return
-
-
-@app.cell
 def _():
     return
 
@@ -183,14 +223,13 @@ def _(alt, new, old, pl):
             size=alt.value(10),
             color="src",
         )
-        .interactive()
     )
     return (points_chart,)
 
 
 @app.cell
-def _(mo, points_chart):
-    mo.ui.altair_chart(points_chart)
+def _(points_chart):
+    points_chart
     return
 
 
