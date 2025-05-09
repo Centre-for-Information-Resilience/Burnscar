@@ -14,4 +14,4 @@ SELECT
   ST_ASWKB(i.geom)::BLOB AS area_include_geom
 FROM arson.firms AS f
 JOIN arson.areas_include AS i
-  ON ST_WITHIN(f.geom, i.geom)
+  ON ST_INTERSECTS(f.geom, i.geom)
