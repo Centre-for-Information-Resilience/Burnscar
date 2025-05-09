@@ -26,7 +26,7 @@ SELECT
   v.burnt_building_count
 FROM arson.firms AS f
 JOIN arson.areas_include AS i
-  ON ST_WITHIN(f.geom, i.geom)
+  ON ST_INTERSECTS(f.geom, i.geom)
 JOIN arson.firms_validated AS v
   ON f.id = v.firms_id
 JOIN arson.firms_clustered AS c

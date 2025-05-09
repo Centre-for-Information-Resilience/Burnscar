@@ -21,7 +21,7 @@ WITH clusters AS (
     f.acq_date - LAG(f.acq_date) OVER (PARTITION BY i.id ORDER BY f.acq_date) AS date_diff
   FROM arson.firms AS f
   JOIN arson.areas_include AS i
-    ON ST_WITHIN(f.geom, i.geom)
+    ON ST_INTERSECTS(f.geom, i.geom)
   JOIN arson.firms_validated AS v
     ON f.id = v.firms_id
 ), event_assignments /* Step 3: Group events per area & summarize */ AS (

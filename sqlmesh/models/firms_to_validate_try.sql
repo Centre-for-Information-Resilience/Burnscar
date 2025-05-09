@@ -14,7 +14,7 @@ WHERE
   @AND(
     (
       acq_date < CURRENT_DATE - INTERVAL (
-        CONCAT(@day_, ' days')
+       @day_ || ' days'
       )
     ),
     @IF(
