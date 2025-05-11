@@ -10,18 +10,17 @@ gateways:
       # register_comments: True
       # pre_ping: False
       pretty_sql: True
-      # catalogs: 
+      # catalogs:
       extensions:
         - spatial
-      # connector_config: 
-      # token: 
-
+      # connector_config:
+      # token:
 
 default_gateway: duckdb
 
 model_defaults:
   dialect: duckdb
-  start: 2025-03-18
+  start: 2025-04-20
 
 variables:
   # settings
@@ -43,9 +42,8 @@ variables:
 
   # clustering
   clustering_max_date_gap: 2
-  
+
   # paths
-  path_raw_data: ../data/raw
   path_geo: ../geo
   path_gadm: ../data/gadm
   path_settlements: ../geo/settlements.gpkg

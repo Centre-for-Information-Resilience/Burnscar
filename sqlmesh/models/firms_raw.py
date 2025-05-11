@@ -1,7 +1,6 @@
 import datetime
 import os
 import typing as t
-from pathlib import Path
 
 import pandas as pd
 from dotenv import load_dotenv
@@ -49,10 +48,6 @@ def fetch_nasa_data(
     load_dotenv()
     api_key_nasa = os.getenv("API_KEY_NASA")
     assert api_key_nasa, "API_KEY_NASA must be set in your .env file"
-
-    output_dir = context.var("path_raw_data")
-    assert output_dir, "Output directory must be set in the context variables"
-    output_dir = Path(output_dir)
 
     country_id = context.var("country_id")
     assert country_id, "Country code must be set in the context variables"
