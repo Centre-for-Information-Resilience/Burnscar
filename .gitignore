@@ -8,6 +8,7 @@ logs
 *.db
 **/*.pyc
 __pycache__
+__marimo__
 
 data/*
 duckdb/*

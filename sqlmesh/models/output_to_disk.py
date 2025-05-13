@@ -1,7 +1,7 @@
 import typing as t
 from pathlib import Path
 
-from arson_analyser.linkgen import add_links
+from arson.linkgen import add_links
 from sqlmesh import ExecutionContext, model
 from sqlmesh.core.model import ModelKindName
 
