@@ -4,6 +4,7 @@
 .pytest_cache
 .env
 .cache
+.vscode
 logs
 *.db
 **/*.pyc
