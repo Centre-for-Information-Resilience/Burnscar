@@ -43,7 +43,6 @@ variables:
   clustering_max_date_gap: 2
 
   # paths
-  path_geo: geo
   path_gadm: data/gadm
   path_settlements: geo/settlements.gpkg
   path_output: output

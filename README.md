@@ -1,6 +1,5 @@
 # 🔥 Arson Detection Pipeline
 
-[![Build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/your-repo)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
@@ -61,25 +60,27 @@ For configuration of the project refer to the SQLMesh [config file](./sqlmesh/co
         - `nbr_difference_limit`: 0.15
 
     - # clustering
-    - `clustering_max_date_gap`: 2
+    - `clustering_max_date_gap`: Maximum gap between two consecutive FIRMS events used for clustering
 
     - # paths
-    - `path_raw_data`: ../data/raw
-    - `path_geo`: ../geo
-    - `path_gadm`: ../data/gadm
-    - `path_settlements`: ../geo/settlements.gpkg
-    - `path_output`: ../output
+    - `path_gadm`: Path to write gadm .gpkg files to
+    - `path_settlements`: Path to settlements .gpkg file
+    - `path_output`: Path to write output to
 
     - `paths_areas`:
-        - `include`: ../geo/include.gpkg
-        - `exclude`: ../geo/exclude.gpkg
+        - `include`: Path to inclusion areas .gpkg
+        - `exclude`: Path to exclusion areas .gpkg 
 
 
 ### 3. Run the SQLMesh pipeline
 
 ```bash
-cd sqlmesh
-uv run sqlmesh run
+uv run arson run
+```
+or 
+```bash
+source .venv/bin/activate
+arson run
 ```
 
 ### 4. Inspect the results
@@ -99,9 +100,8 @@ uv run sqlmesh run
 data/               # GADM admin boundary data
 geo/                # Custom spatial boundaries and settlements
 sqlmesh/            # SQLMesh config, models, macros
-src/arson_analyser/ # Python source (fetchers, validators, logic)
+src/arson/          # Python source (fetchers, validators, logic)
 output/             # Final exported datasets
-logs/               # Pipeline logs
 docs/               # Validation scripts & diagrams
 ```
 
