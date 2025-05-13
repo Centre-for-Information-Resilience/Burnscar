@@ -1,6 +1,5 @@
 import datetime
 import logging
-import os
 import typing as t
 
 import ee
@@ -41,9 +40,7 @@ class ValidationResult(BaseModel):
 
 
 class GEEValidator:
-    def __init__(self, project: str):
-        api_key = os.getenv("API_KEY_EARTH_ENGINE")
-        assert api_key, "API_KEY_EARTH_ENGINE must be set in your .env file"
+    def __init__(self, project: str, api_key: str):
         ee.Initialize(project=project, cloud_api_key=api_key)
 
         self._define_collections()

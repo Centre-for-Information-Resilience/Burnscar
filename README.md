@@ -1,13 +1,3 @@
-# Fire Detection and Mapping
-
-
-Here's the updated `README.md`, now including:
-
-* Requirements for the NASA FIRMS API key and Google Earth Engine project access
-* Badges for build status (placeholder), license, and Python version
-
----
-
 # 🔥 Arson Detection Pipeline
 
 [![Build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/your-repo)
@@ -21,9 +11,9 @@ This project identifies potential arson incidents using NASA FIRMS active fire a
 ## 🧠 Pipeline Summary
 
 1. **Fetch** fire alerts from NASA FIRMS.
-2. **Filter** alerts spatially using GADM boundaries.
+2. **Filter** alerts spatially using spatial filter. (usually urban areas)
 3. **Validate** detections via Sentinel-2 imagery (Google Earth Engine).
-4. **Cluster** validated points by date and proximity to urban areas.
+4. **Cluster** validated points by date and to urban areas.
 5. **Export** clean datasets of verified and clustered fires.
 
 ---
@@ -54,7 +44,7 @@ For configuration of the project refer to the SQLMesh [config file](./sqlmesh/co
 
 - `model_defaults.start`: Set the start date of the project.
 - `variables`
-    - `ee_project`: Name of the Google Earth Engine project
+    - `project_id_earth_engine`: Name of the Google Earth Engine project
     - `ee_concurrency`: Max number of threads used for fetching data from gee. 50 uses ~1.5GB of RAM
     - `country_id`: 3-letter country code
     - `gadm_level`: GADM administrative areas level (between 1 and 3). Some countries don't have higher levels available

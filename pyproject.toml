@@ -1,5 +1,5 @@
 [project]
-name = "arson-analyser"
+name = "arson"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -21,11 +21,13 @@ dependencies = [
     "shapely>=2.0.7",
     "sqlmesh[web]>=0.170.1",
     "tqdm>=4.67.1",
-    "typer>=0.15.2",
 ]
 
 [project.scripts]
-arson = "arson_analyser.cli.main:app"
+arson = "arson.cli:sqlmesh_cli"
+
+[tool.uv]
+package = true
 
 [build-system]
 requires = ["hatchling"]

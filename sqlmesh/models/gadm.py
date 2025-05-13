@@ -2,7 +2,7 @@ from pathlib import Path
 
 from sqlglot import exp
 
-from arson_analyser.fetchers.gadm import ensure_gadm
+from arson.fetchers.gadm import ensure_gadm
 from sqlmesh import ExecutionContext, model
 from sqlmesh.core.model import ModelKindName
 
