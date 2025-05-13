@@ -29,21 +29,21 @@ Before you begin:
 
 ## 🚀 Quickstart
 
-### 1. Clone and install dependencies
+### 1. Clone this repository
 
 ```bash
-uv sync
+git clone https://github.com/Centre-for-Information-Resilience/Fire_mapping
 ````
 
 ### 2. Add credentials
 
-To set your API keys, change the `example.env` file to `.env` and fill in your API keys for FIRMS and Google Earth Engine.
+To set your API keys, change the `example.env` file to `.env` and fill in your API keys and project ID for FIRMS and Google Earth Engine.
 
 For configuration of the project refer to the SQLMesh [config file](./sqlmesh/config.yaml). The following configuration options are currently available:
 
-- `model_defaults.start`: Set the start date of the project.
+- `model_defaults`:
+  - `start`: Set the start date of the project.
 - `variables`
-    - `project_id_earth_engine`: Name of the Google Earth Engine project
     - `ee_concurrency`: Max number of threads used for fetching data from gee. 50 uses ~1.5GB of RAM
     - `country_id`: 3-letter country code
     - `gadm_level`: GADM administrative areas level (between 1 and 3). Some countries don't have higher levels available
@@ -113,6 +113,11 @@ docs/               # Validation scripts & diagrams
 * **Copernicus Sentinel-2** – Post-burn surface reflectance
 * **GADM** – Global administrative boundaries
 * **Urban settlements layer** – Custom vector for clustering
+
+---
+
+## 🗃️ SQLMesh Model DAG
+![SQLMesh Model DAG](./docs/dag.svg)
 
 ---
 
