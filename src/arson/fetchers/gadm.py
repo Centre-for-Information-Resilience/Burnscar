@@ -19,6 +19,7 @@ def fetch_gadm(country_id: str) -> bytes:
 
 
 def ensure_gadm(path: Path, country_id: str) -> Path:
+    path.mkdir(parents=True, exist_ok=True)
     full_path = path / get_gadm_filename(country_id)
 
     if not full_path.exists():
