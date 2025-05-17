@@ -13,6 +13,8 @@ from sqlmesh.core.model import ModelKindName
 COLUMNS = {
     "firms_id": "int",
     "acq_date": "date",
+    "before_date": "date",
+    "after_date": "date",
     "burn_scar_detected": "bool",
     "burnt_pixel_count": "int",
     "burnt_building_count": "int",

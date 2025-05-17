@@ -26,6 +26,8 @@ class ValidationResult(BaseModel):
 
     firms_id: int
     acq_date: datetime.date
+    before_date: datetime.date | None = None
+    after_date: datetime.date | None = None
     burn_scar_detected: bool = False
     burnt_pixel_count: int = 0
     burnt_building_count: int = 0
@@ -132,6 +134,9 @@ class GEEValidator:
         before, after = self.get_nearest_surrounding_dates(
             detection.acq_date, image_dates
         )
+
+        result.before_date = before
+        result.after_date = after
 
         before_image = (
             s2.filterDate(str(before), str(before + datetime.timedelta(days=1)))

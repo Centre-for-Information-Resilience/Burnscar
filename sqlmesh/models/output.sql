@@ -19,6 +19,8 @@ SELECT
   s.settlement_name,
   i.id AS area_include_id,
   c.event_no,
+  v.before_date,
+  v.after_date,
   v.no_data,
   v.too_cloudy,
   v.burn_scar_detected,
