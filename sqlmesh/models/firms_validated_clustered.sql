@@ -24,7 +24,7 @@ WITH clusters AS (
     v.too_cloudy,
     LAG(f.acq_date) OVER (PARTITION BY i.id ORDER BY f.acq_date) AS prev_date,
     f.acq_date - LAG(f.acq_date) OVER (PARTITION BY i.id ORDER BY f.acq_date) AS date_diff
-  FROM arson.firms_validated
+  FROM arson.firms_validated as v
   JOIN arson.firms AS f
     ON v.firms_id = f.id
   JOIN arson.areas_include AS i
