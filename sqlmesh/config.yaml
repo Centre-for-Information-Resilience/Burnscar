@@ -20,7 +20,7 @@ default_gateway: duckdb
 
 model_defaults:
   dialect: duckdb
-  start: 2025-04-20
+  start: 2025-03-01
 
 variables:
   # settings
@@ -43,10 +43,10 @@ variables:
   clustering_max_date_gap: 2
 
   # paths
-  path_gadm: data/gadm
-  path_settlements: geo/settlements.gpkg
-  path_output: output
+  path_gadm: ../data/gadm
+  path_geonames: ../data/geonames
+  path_output: ../output
 
   paths_areas:
-    include: geo/include.gpkg
-    exclude: geo/exclude.gpkg
+    include: ../geo/include.gpkg
+    exclude: ../geo/exclude.gpkg

@@ -2,7 +2,10 @@ MODEL (
   name arson.firms_clustered,
   kind VIEW,
   description 'FIRMS events clustered by area and date.',
-  grain (area_include_id, event_no)
+  grain (area_include_id, event_no),
+  audits (
+    NUMBER_OF_ROWS(threshold := 1)
+  ),
 );
 
 WITH clusters AS (
@@ -12,6 +15,8 @@ WITH clusters AS (
     f.acq_date,
     f.geom,
     i.id AS area_include_id,
+    v.before_date,
+    v.after_date,
     v.burn_scar_detected,
     v.burnt_pixel_count,
     v.burnt_building_count,
@@ -36,19 +41,40 @@ WITH clusters AS (
       END
     ) OVER (PARTITION BY area_include_id ORDER BY acq_date) AS event_no
   FROM clusters
+),
+distances AS (
+  SELECT
+    a.area_include_id,
+    a.event_no,
+    MAX(ST_Distance(@geo_transform(a.geom),
+        @geo_transform(b.geom))) AS max_distance,
+  FROM event_assignments a
+  JOIN event_assignments b
+    ON a.area_include_id = b.area_include_id
+    AND a.event_no = b.event_no
+    AND a.id < b.id  -- prevent duplicate + self-pairing
+  GROUP BY a.area_include_id, a.event_no
 )
+
 SELECT
-  area_include_id,
-  event_no::INT,
-  MIN(acq_date) AS start_date,
-  MAX(acq_date) AS end_date,
-  AVG(burn_scar_detected::INT) AS burn_scar_detected,
-  AVG(burnt_pixel_count) AS burnt_pixel_count,
-  AVG(burnt_building_count) AS burnt_building_count,
-  AVG(no_data::INT) AS no_data,
-  AVG(too_cloudy::INT) AS too_cloudy,
+  ea.area_include_id,
+  ea.event_no::INT,
+  ST_Centroid(ST_Union_Agg(ea.geom)) AS geom,
+  COALESCE(MAX(d.max_distance), 0) AS max_distance,
+  MIN(ea.acq_date) AS start_date,
+  MAX(ea.acq_date) AS end_date,
+  MODE(ea.before_date) AS before_date,
+  MODE(ea.after_date) AS after_date,
+  AVG(ea.burn_scar_detected::INT) AS burn_scar_detected,
+  AVG(ea.burnt_pixel_count) AS burnt_pixel_count,
+  AVG(ea.burnt_building_count) AS burnt_building_count,
+  AVG(ea.no_data::INT) AS no_data,
+  AVG(ea.too_cloudy::INT) AS too_cloudy,
   COUNT(*) AS event_count
-FROM event_assignments
+FROM event_assignments ea
+LEFT JOIN distances d
+  ON ea.area_include_id = d.area_include_id
+  AND ea.event_no = d.event_no
 GROUP BY
   area_include_id,
   event_no
