@@ -59,7 +59,7 @@ JOIN arson.areas_include AS i
   ON ST_INTERSECTS(f.geom, i.geom)
 JOIN arson.firms_validated AS v
   ON f.id = v.firms_id
-JOIN arson.firms_clustered AS c
+JOIN arson.firms_validated_clustered AS c
   ON i.id = c.area_include_id
   AND f.acq_date >= c.start_date
   AND f.acq_date <= c.end_date

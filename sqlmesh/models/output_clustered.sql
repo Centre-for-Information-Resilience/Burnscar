@@ -11,7 +11,7 @@ WITH distances AS (
     fc.area_include_id,
     g.name AS settlement_name,
     ST_DISTANCE(fc.geom, g.geom) AS distance
-  FROM arson.firms_clustered AS fc
+  FROM arson.firms_validated_clustered AS fc
   LEFT JOIN arson.geonames AS g
     ON ST_DWithin(
       fc.geom,
@@ -39,7 +39,7 @@ SELECT
   @IF(@gadm_level >= 2, g.gadm_2),
   @IF(@gadm_level >= 3, g.gadm_3),
   ng.settlement_name,
-FROM arson.firms_clustered AS fc
+FROM arson.firms_validated_clustered AS fc
 LEFT JOIN nearest_geonames AS ng
   ON fc.area_include_id = ng.area_include_id
 JOIN arson.gadm AS g
