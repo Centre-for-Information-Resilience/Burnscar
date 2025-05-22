@@ -10,7 +10,7 @@ COPERNICUS_SCRIPT_B64 = b64encode(COPERNICUS_SCRIPT.encode()).decode()
 
 
 def gsheet_format(url: str, name: str) -> str:
-    return f'HYPERLINK("{url}","{name}")'
+    return f'=HYPERLINK("{url}","{name}")'
 
 
 def copernicus(
@@ -84,19 +84,18 @@ def whopostedwhat(
 
 def add_links(
     output: pd.DataFrame,
-    date_window_size: int = 5,
+    id_columns: list[str] = ["firms_id"],
+    date_buffer: int = 3,
     keyword_cols: list[str] = ["settlement_name", "gadm_1", "gadm_2", "gadm_3"],
 ) -> pd.DataFrame:
     rows = []
     for _, row in output.iterrows():
-        start_date = (
-            row["acq_date"] - datetime.timedelta(days=date_window_size)
-        ).date()
-        end_date = (row["acq_date"] + datetime.timedelta(days=date_window_size)).date()
+        start_date = row.get("start_date") or row["acq_date"]
+        end_date = row.get("end_date") or row["acq_date"]
+        start_date = (start_date - datetime.timedelta(days=date_buffer)).date()
+        end_date = (end_date + datetime.timedelta(days=date_buffer)).date()
 
-        links = {
-            "firms_id": row["firms_id"],
-        }
+        links = row[id_columns].to_dict()
 
         links["link_copernicus_before"] = gsheet_format(
             copernicus(
@@ -144,7 +143,7 @@ def add_links(
         rows.append(links)
 
     links_df = pd.DataFrame.from_records(rows)
-    output = output.merge(links_df, on="firms_id")
+    output = output.merge(links_df, on=id_columns)
     return output
 
 
