@@ -7,34 +7,6 @@ MODEL (
   ),
 );
 
-WITH distances AS (
-  SELECT
-    v.firms_id,
-    g.name AS settlement_name,
-    ST_DISTANCE(f.geom, g.geom) AS distance
-  FROM arson.firms_validated AS v
-  JOIN arson.firms AS f
-    ON v.firms_id = f.id
-  LEFT JOIN arson.geonames AS g
-    ON ST_DWithin(
-      f.geom,
-      g.geom,
-      30000  -- limit to 30km
-    )
-), ranked AS (
-  SELECT
-    *,
-    ROW_NUMBER() OVER (PARTITION BY firms_id ORDER BY distance ASC) AS rn
-  FROM distances
-), nearest_geonames AS (
-SELECT
-  firms_id,
-  settlement_name
-FROM ranked
-WHERE
-  rn = 1)
-
-/* F */
 SELECT
   f.id AS firms_id,
   ST_Y(f.geom)::DOUBLE AS latitude,
@@ -63,7 +35,7 @@ JOIN arson.firms_validated_clustered AS c
   ON i.id = c.area_include_id
   AND f.acq_date >= c.start_date
   AND f.acq_date <= c.end_date
-LEFT JOIN nearest_geonames AS ng
+LEFT JOIN arson.nearest_geonames_firms_validated AS ng
   ON f.id = ng.firms_id
 JOIN arson.gadm AS g
   ON ST_INTERSECTS(f.geom, g.geom)

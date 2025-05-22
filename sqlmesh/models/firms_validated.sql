@@ -7,9 +7,12 @@ MODEL (
 );
 
 SELECT
-  *
+  v.*,
+  f.geom AS geom,
 FROM (
   @UNION('DISTINCT', @EACH([0, 1, 2], try_ -> arson.firms_validated_@{try_}))
-)
+) as v
+JOIN arson.firms AS f
+  ON v.firms_id = f.id
 ORDER BY
-  acq_date
+  v.acq_date
