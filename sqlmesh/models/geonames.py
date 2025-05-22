@@ -36,7 +36,7 @@ def geonames(
     return f"""
         SELECT
             name::text,
-            st_point(latitude, longitude)::geometry as geom,
+            st_point(longitude, latitude)::geometry as geom,
 
         FROM read_csv('{full_path_geonames}', names = [
             'geonameid',
