@@ -1,5 +1,5 @@
 MODEL (
-  name arson.firms_validated_clustered,
+  name arson.int_firms_validated_clustered,
   kind VIEW,
   description 'FIRMS events clustered by area and date.',
   grain (area_include_id, event_no),
@@ -24,10 +24,10 @@ WITH clusters AS (
     v.too_cloudy,
     LAG(f.acq_date) OVER (PARTITION BY i.id ORDER BY f.acq_date) AS prev_date,
     f.acq_date - LAG(f.acq_date) OVER (PARTITION BY i.id ORDER BY f.acq_date) AS date_diff
-  FROM arson.firms_validated as v
-  JOIN arson.firms AS f
+  FROM arson.int_firms_validated as v
+  JOIN arson.int_firms AS f
     ON v.firms_id = f.id
-  JOIN arson.areas_include AS i
+  JOIN arson.ref_areas_include AS i
     ON ST_INTERSECTS(f.geom, i.geom)
 ), event_assignments /* Step 3: Group events per area & summarize */ AS (
   /* Step 2: Assign event IDs based on date gaps */

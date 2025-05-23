@@ -1,5 +1,5 @@
 MODEL (
-  name arson.firms,
+  name arson.int_firms,
   kind INCREMENTAL_BY_TIME_RANGE (
     time_column acq_date
   ),
@@ -13,7 +13,7 @@ SELECT
   )::INT AS id,
   r.acq_date,
   ST_POINT(r.longitude, r.latitude)::GEOMETRY AS geom
-FROM arson.firms_raw AS r
+FROM arson.stg_firms AS r
 WHERE
   r.acq_date BETWEEN @start_ds AND @end_ds;
 

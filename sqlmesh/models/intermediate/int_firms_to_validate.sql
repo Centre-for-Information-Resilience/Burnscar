@@ -1,5 +1,5 @@
 MODEL (
-  name arson.firms_to_validate,
+  name arson.int_firms_to_validate,
   kind VIEW,
   description "FIRMS events pending validation.",
   audits (
@@ -12,6 +12,6 @@ SELECT
   f.acq_date,
   ST_ASWKB(f.geom)::BLOB AS geom,
   ST_ASWKB(i.geom)::BLOB AS area_include_geom
-FROM arson.firms AS f
-JOIN arson.areas_include AS i
+FROM arson.int_firms AS f
+JOIN arson.ref_areas_include AS i
   ON ST_INTERSECTS(f.geom, i.geom)
