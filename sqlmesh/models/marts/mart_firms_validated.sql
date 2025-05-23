@@ -1,5 +1,5 @@
 MODEL (
-  name arson.output,
+  name arson.mart_firms_validated,
   kind VIEW,
   description 'Final output of the pipeline, including all relevant information for each FIRMS event.',
   audits (
@@ -18,7 +18,7 @@ SELECT
   @IF(@gadm_level >= 3, g.gadm_3),
   ng.settlement_name,
   i.id AS area_include_id,
-  c.event_no,
+  fvc.event_no,
   v.before_date,
   v.after_date,
   v.no_data,
@@ -26,20 +26,20 @@ SELECT
   v.burn_scar_detected,
   v.burnt_pixel_count,
   v.burnt_building_count
-FROM arson.firms AS f
-JOIN arson.areas_include AS i
+FROM arson.int_firms AS f
+JOIN arson.ref_areas_include AS i
   ON ST_INTERSECTS(f.geom, i.geom)
-JOIN arson.firms_validated AS v
+JOIN arson.int_firms_validated AS v
   ON f.id = v.firms_id
-JOIN arson.firms_validated_clustered AS c
-  ON i.id = c.area_include_id
-  AND f.acq_date >= c.start_date
-  AND f.acq_date <= c.end_date
-LEFT JOIN arson.nearest_geonames_firms_validated AS ng
+JOIN arson.int_firms_validated_clustered AS fvc
+  ON i.id = fvc.area_include_id
+  AND f.acq_date >= fvc.start_date
+  AND f.acq_date <= fvc.end_date
+LEFT JOIN arson.int_nearest_geonames_firms_validated AS ng
   ON f.id = ng.firms_id
-JOIN arson.gadm AS g
+JOIN arson.ref_gadm AS g
   ON ST_INTERSECTS(f.geom, g.geom)
 ORDER BY
   i.id,
-  c.event_no,
+  fvc.event_no,
   f.acq_date

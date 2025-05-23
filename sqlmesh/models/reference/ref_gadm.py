@@ -8,7 +8,7 @@ from sqlmesh.core.model import ModelKindName
 
 
 @model(
-    name="arson.gadm",
+    name="arson.ref_gadm",
     kind=ModelKindName.FULL,
     is_sql=True,
     post_statements=[

@@ -12,7 +12,7 @@ from sqlmesh.core.model import ModelKindName
 
 
 @model(
-    name="arson.firms_raw",
+    name="arson.stg_firms",
     kind=dict(
         name=ModelKindName.INCREMENTAL_BY_TIME_RANGE,
         time_column="acq_date",

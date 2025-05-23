@@ -1,5 +1,5 @@
 MODEL (
-  name arson.nearest_geonames_@source_table,
+  name arson.int_nearest_geonames_@source_table,
   description 'Find the nearest geoname settlement for each FIRMS event.',
   kind view,
   blueprints (
@@ -15,8 +15,8 @@ WITH distances AS (
     s.@id_col,
     g.name AS settlement_name,
     ST_DISTANCE(s.geom, g.geom) AS distance
-  FROM arson.@source_table AS s
-  LEFT JOIN arson.geonames AS g
+  FROM arson.int_@source_table AS s
+  LEFT JOIN arson.ref_geonames AS g
     ON ST_DWithin(
       s.geom,
       g.geom,

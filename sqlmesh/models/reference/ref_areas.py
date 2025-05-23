@@ -7,7 +7,7 @@ from sqlmesh.core.model import model
 
 
 @model(
-    "arson.areas_@{in_ex}",
+    "arson.ref_areas_@{in_ex}",
     is_sql=True,
     kind="VIEW",
     blueprints=[
