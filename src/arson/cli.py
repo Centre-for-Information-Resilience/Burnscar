@@ -18,7 +18,7 @@ def ensure_sqlmesh_root():
 
 
 @app.command()
-def init(env: str = "prod"):
+def init(env: str = typer.Argument("prod", help="Environment to initialize")):
     """
     Initialize the SQLMesh environment and apply the initial plan.
     """
