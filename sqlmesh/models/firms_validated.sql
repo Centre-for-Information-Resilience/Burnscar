@@ -14,5 +14,8 @@ FROM (
 ) as v
 JOIN arson.firms AS f
   ON v.firms_id = f.id
+LEFT JOIN arson.areas_exclude AS e
+  ON NOT ST_INTERSECTS(f.geom, e.geom)
+WHERE e.geom IS NULL
 ORDER BY
   v.acq_date
