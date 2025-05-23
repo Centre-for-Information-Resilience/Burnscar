@@ -17,10 +17,11 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "shapely>=2.0.7",
     "sqlmesh[web]>=0.170.1",
+    "typer>=0.15.4",
 ]
 
 [project.scripts]
-arson = "arson.cli:sqlmesh_cli"
+arson = "arson.cli:app"
 
 [tool.uv]
 package = true
