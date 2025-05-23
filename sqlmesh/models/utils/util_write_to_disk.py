@@ -7,7 +7,7 @@ from sqlmesh.core.model import ModelKindName
 
 
 @model(
-    name="arson.output_to_disk",
+    name="arson.util_write_to_disk",
     kind=ModelKindName.FULL,
     description="Final outputs: output.csv (with added social links), output_clustered.csv (clusters of detections)",
     columns={"firms_id": "int"},
