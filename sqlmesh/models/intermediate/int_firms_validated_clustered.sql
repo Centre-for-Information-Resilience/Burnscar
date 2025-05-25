@@ -5,7 +5,7 @@ MODEL (
   grain (area_include_id, event_no),
   audits (
     NUMBER_OF_ROWS(threshold := 1)
-  ),
+  )
 );
 
 WITH clusters AS (
@@ -24,7 +24,7 @@ WITH clusters AS (
     v.too_cloudy,
     LAG(f.acq_date) OVER (PARTITION BY i.id ORDER BY f.acq_date) AS prev_date,
     f.acq_date - LAG(f.acq_date) OVER (PARTITION BY i.id ORDER BY f.acq_date) AS date_diff
-  FROM arson.int_firms_validated as v
+  FROM arson.int_firms_validated AS v
   JOIN arson.int_firms AS f
     ON v.firms_id = f.id
   JOIN arson.ref_areas_include AS i
@@ -41,25 +41,22 @@ WITH clusters AS (
       END
     ) OVER (PARTITION BY area_include_id ORDER BY acq_date) AS event_no
   FROM clusters
-),
-distances AS (
+), distances AS (
   SELECT
     a.area_include_id,
     a.event_no,
-    MAX(ST_Distance(@geo_transform(a.geom),
-        @geo_transform(b.geom))) AS max_distance,
-  FROM event_assignments a
-  JOIN event_assignments b
-    ON a.area_include_id = b.area_include_id
-    AND a.event_no = b.event_no
-    AND a.id < b.id 
-  GROUP BY a.area_include_id, a.event_no
+    MAX(ST_DISTANCE(@geo_transform(a.geom), @geo_transform(b.geom))) AS max_distance
+  FROM event_assignments AS a
+  JOIN event_assignments AS b
+    ON a.area_include_id = b.area_include_id AND a.event_no = b.event_no AND a.id < b.id
+  GROUP BY
+    a.area_include_id,
+    a.event_no
 )
-
 SELECT
   ea.area_include_id,
   ea.event_no::INT,
-  ST_Centroid(ST_Union_Agg(ea.geom)) AS geom,
+  ST_CENTROID(ST_UNION_AGG(ea.geom)) AS geom,
   COALESCE(MAX(d.max_distance), 0) AS max_distance,
   MIN(ea.acq_date) AS start_date,
   MAX(ea.acq_date) AS end_date,
@@ -71,10 +68,9 @@ SELECT
   AVG(ea.no_data::INT) AS no_data,
   AVG(ea.too_cloudy::INT) AS too_cloudy,
   COUNT(*) AS event_count
-FROM event_assignments ea
-LEFT JOIN distances d
-  ON ea.area_include_id = d.area_include_id
-  AND ea.event_no = d.event_no
+FROM event_assignments AS ea
+LEFT JOIN distances AS d
+  ON ea.area_include_id = d.area_include_id AND ea.event_no = d.event_no
 GROUP BY
   area_include_id,
   event_no
