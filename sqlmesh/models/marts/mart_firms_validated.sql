@@ -4,7 +4,7 @@ MODEL (
   description 'Final output of the pipeline, including all relevant information for each FIRMS event.',
   audits (
     NUMBER_OF_ROWS(threshold := 1)
-  ),
+  )
 );
 
 SELECT
