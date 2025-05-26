@@ -20,6 +20,7 @@ COLUMNS = {
     "burnt_building_count": "int",
     "no_data": "bool",
     "too_cloudy": "bool",
+    "validation_try": "int",
 }
 
 KIND = dict(
@@ -35,6 +36,7 @@ def validate(
     start: datetime.datetime,
     end: datetime.datetime,
     firms_to_validate_table: str,
+    try_: int = 0,
 ) -> t.Generator[pd.DataFrame, None, None]:
     # fetch data
     firms_to_validate = context.fetchdf(
@@ -75,7 +77,10 @@ def validate(
         detections, validation_params=validation_params, max_workers=ee_concurrency
     ):
         validation_result_dict = validation_result.model_dump()
-        yield pd.DataFrame([validation_result_dict])
+        result_df = pd.DataFrame([validation_result_dict])
+        result_df["validation_try"] = try_
+
+        yield result_df
 
 
 @model(
@@ -91,7 +96,13 @@ def firms_validated_try_0(
 ) -> t.Generator[pd.DataFrame, None, None]:
     firms_to_validate_table = context.resolve_table("arson.int_firms_to_validate_0")
 
-    yield from validate(context, start, end, firms_to_validate_table)
+    yield from validate(
+        context=context,
+        start=start,
+        end=end,
+        firms_to_validate_table=firms_to_validate_table,
+        try_=0,
+    )
 
 
 @model(
@@ -107,7 +118,13 @@ def firms_validated_try_1(
 ) -> t.Generator[pd.DataFrame, None, None]:
     firms_to_validate_table = context.resolve_table("arson.int_firms_to_validate_1")
 
-    yield from validate(context, start, end, firms_to_validate_table)
+    yield from validate(
+        context=context,
+        start=start,
+        end=end,
+        firms_to_validate_table=firms_to_validate_table,
+        try_=1,
+    )
 
 
 @model(
@@ -123,4 +140,10 @@ def firms_validated_try_2(
 ) -> t.Generator[pd.DataFrame, None, None]:
     firms_to_validate_table = context.resolve_table("arson.int_firms_to_validate_2")
 
-    yield from validate(context, start, end, firms_to_validate_table)
+    yield from validate(
+        context=context,
+        start=start,
+        end=end,
+        firms_to_validate_table=firms_to_validate_table,
+        try_=2,
+    )

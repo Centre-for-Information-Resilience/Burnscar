@@ -23,6 +23,7 @@ SELECT
   v.after_date,
   v.no_data,
   v.too_cloudy,
+  v.validation_try,
   v.burn_scar_detected,
   v.burnt_pixel_count,
   v.burnt_building_count
