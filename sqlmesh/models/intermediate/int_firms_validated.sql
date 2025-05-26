@@ -18,5 +18,6 @@ LEFT JOIN arson.ref_areas_exclude AS e
   ON NOT ST_INTERSECTS(f.geom, e.geom)
 WHERE
   e.geom IS NULL
+QUALIFY ROW_NUMBER() OVER (PARTITION BY v.firms_id ORDER BY v.validation_try DESC) = 1
 ORDER BY
   v.acq_date
