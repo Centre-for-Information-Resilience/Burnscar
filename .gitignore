@@ -7,6 +7,7 @@
 .vscode
 logs
 *.db
+*.db.wal
 **/*.pyc
 __pycache__
 __marimo__
