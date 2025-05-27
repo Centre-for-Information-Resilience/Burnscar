@@ -16,7 +16,7 @@ dependencies = [
     "pydantic>=2.10.6",
     "python-dotenv>=1.0.1",
     "shapely>=2.0.7",
-    "sqlmesh[web]>=0.170.1",
+    "sqlmesh[lsp,web]>=0.186.1",
     "typer>=0.15.4",
 ]
 
@@ -36,7 +36,6 @@ dev = [
     "pandas-stubs>=2.2.3.250308",
     "pytest>=8.3.5",
     "ruff>=0.9.10",
-    "sqlmesh[lsp]>=0.178.2",
     "types-shapely>=2.0.0.20250202",
     "types-tqdm>=4.67.0.20250319",
 ]

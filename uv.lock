@@ -43,7 +43,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "python-dotenv" },
     { name = "shapely" },
-    { name = "sqlmesh", extra = ["web"] },
+    { name = "sqlmesh", extra = ["lsp", "web"] },
     { name = "typer" },
 ]
 
@@ -53,7 +53,6 @@ dev = [
     { name = "pandas-stubs" },
     { name = "pytest" },
     { name = "ruff" },
-    { name = "sqlmesh", extra = ["lsp"] },
     { name = "types-shapely" },
     { name = "types-tqdm" },
 ]
@@ -68,7 +67,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "shapely", specifier = ">=2.0.7" },
-    { name = "sqlmesh", extras = ["web"], specifier = ">=0.170.1" },
+    { name = "sqlmesh", extras = ["lsp", "web"], specifier = ">=0.186.1" },
     { name = "typer", specifier = ">=0.15.4" },
 ]
 
@@ -78,7 +77,6 @@ dev = [
     { name = "pandas-stubs", specifier = ">=2.2.3.250308" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "ruff", specifier = ">=0.9.10" },
-    { name = "sqlmesh", extras = ["lsp"], specifier = ">=0.178.2" },
     { name = "types-shapely", specifier = ">=2.0.0.20250202" },
     { name = "types-tqdm", specifier = ">=4.67.0.20250319" },
 ]
@@ -190,14 +188,14 @@ wheels = [
 
 [[package]]
 name = "click"
-version = "8.1.8"
+version = "8.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593 }
+sdist = { url = "https://files.pythonhosted.org/packages/60/6c/8ca2efa64cf75a977a0d7fac081354553ebe483345c734fb6b6515d96bbc/click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202", size = 286342 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7e/d4/7ebdbd03970677812aac39c869717059dbb71a4cfc033ca6e5221787892c/click-8.1.8-py3-none-any.whl", hash = "sha256:63c132bbbed01578a06712a2d1f497bb62d9c1c0d329b7903a866228027263b2", size = 98188 },
+    { url = "https://files.pythonhosted.org/packages/85/32/10bb5764d90a8eee674e9dc6f4db6a0ab47c8c4d0d83c27f7c39ac415a4d/click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b", size = 102215 },
 ]
 
 [[package]]
@@ -950,15 +948,15 @@ wheels = [
 
 [[package]]
 name = "pandas-stubs"
-version = "2.2.3.250308"
+version = "2.2.3.250527"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "types-pytz" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2e/5a/261f5c67a73e46df2d5984fe7129d66a3ed4864fd7aa9d8721abb3fc802e/pandas_stubs-2.2.3.250308.tar.gz", hash = "sha256:3a6e9daf161f00b85c83772ed3d5cff9522028f07a94817472c07b91f46710fd", size = 103986 }
+sdist = { url = "https://files.pythonhosted.org/packages/5f/0d/5fe7f7f3596eb1c2526fea151e9470f86b379183d8b9debe44b2098651ca/pandas_stubs-2.2.3.250527.tar.gz", hash = "sha256:e2d694c4e72106055295ad143664e5c99e5815b07190d1ff85b73b13ff019e63", size = 106312 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ba/64/ab61d9ca06ff66c07eb804ec27dec1a2be1978b3c3767caaa91e363438cc/pandas_stubs-2.2.3.250308-py3-none-any.whl", hash = "sha256:a377edff3b61f8b268c82499fdbe7c00fdeed13235b8b71d6a1dc347aeddc74d", size = 158053 },
+    { url = "https://files.pythonhosted.org/packages/ec/f8/46141ba8c9d7064dc5008bfb4a6ae5bd3c30e4c61c28b5c5ed485bf358ba/pandas_stubs-2.2.3.250527-py3-none-any.whl", hash = "sha256:cd0a49a95b8c5f944e605be711042a4dd8550e2c559b43d70ba2c4b524b66163", size = 159683 },
 ]
 
 [[package]]
@@ -1412,14 +1410,14 @@ wheels = [
 
 [[package]]
 name = "ruamel-yaml"
-version = "0.18.10"
+version = "0.18.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ruamel-yaml-clib", marker = "python_full_version < '3.13' and platform_python_implementation == 'CPython'" },
+    { name = "ruamel-yaml-clib", marker = "python_full_version < '3.14' and platform_python_implementation == 'CPython'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ea/46/f44d8be06b85bc7c4d8c95d658be2b68f27711f279bf9dd0612a5e4794f5/ruamel.yaml-0.18.10.tar.gz", hash = "sha256:20c86ab29ac2153f80a428e1254a8adf686d3383df04490514ca3b79a362db58", size = 143447 }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/8f/dfbab2d5ec83da0605ab935fb43ffa8ab5828455e2c910b7314fdd18e0b8/ruamel.yaml-0.18.11.tar.gz", hash = "sha256:b586a3416676566ed45bf679a0909719f7ea7b58c03a9b6e03f905a1e2cd5076", size = 144299 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c2/36/dfc1ebc0081e6d39924a2cc53654497f967a084a436bb64402dfce4254d9/ruamel.yaml-0.18.10-py3-none-any.whl", hash = "sha256:30f22513ab2301b3d2b577adc121c6471f28734d3d9728581245f1e76468b4f1", size = 117729 },
+    { url = "https://files.pythonhosted.org/packages/2e/62/615a16ebbca43fd4434843e9d346d795a134d0a1ff46101c858d93c9778d/ruamel.yaml-0.18.11-py3-none-any.whl", hash = "sha256:eca06c9fce6ee3220845c4c54e58376586e041a6127e4d1958e12a3142084897", size = 118313 },
 ]
 
 [[package]]
@@ -1554,11 +1552,11 @@ wheels = [
 
 [[package]]
 name = "sqlglot"
-version = "26.19.0"
+version = "26.21.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/27/93/64691ea1fee6c96ce95663bb4e4b940a99a891d7954628aedd4f4ced21d1/sqlglot-26.19.0.tar.gz", hash = "sha256:042589f9fae232deb227a7a5c977a827c71da75caa2c0c45a2bcb4064dc4a622", size = 5366769 }
+sdist = { url = "https://files.pythonhosted.org/packages/f1/af/b01c222caa9dcedb45ae22ab73f729ed0efa38dc4178529215f941fdb01c/sqlglot-26.21.0.tar.gz", hash = "sha256:95eec1f9bfe28fd2aafdbdf58d098f34312998f45dc87ae4e6453313005b7d8b", size = 5368779 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/13/9f3088fc1f58b44f8561b97c6141e515b4efd5815ba2e1a2b98a18c7b104/sqlglot-26.19.0-py3-none-any.whl", hash = "sha256:f8d2193f0e618ce3ce636290d33c94f444304ca9853b546046fb74983261d249", size = 462578 },
+    { url = "https://files.pythonhosted.org/packages/c0/3b/d3cd28ea4fef88c76da63c496a09b06a0353ddc1b1ae75ceffbfd9d21082/sqlglot-26.21.0-py3-none-any.whl", hash = "sha256:34b64d6921c4a9dec0d234e17b6d1f4724a2bf7443dfa8f5ed6dee7ecb8a4095", size = 463317 },
 ]
 
 [package.optional-dependencies]
@@ -1606,7 +1604,7 @@ wheels = [
 
 [[package]]
 name = "sqlmesh"
-version = "0.186.1"
+version = "0.187.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astor" },
@@ -1629,9 +1627,9 @@ dependencies = [
     { name = "tenacity" },
     { name = "time-machine" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bb/b6/1f6b1931119a5dbfccd475eb0d432be75e75cb4fa9103c9f15501222b184/sqlmesh-0.186.1.tar.gz", hash = "sha256:0280e17d747e698c92d3054e00dae784806a8c90bf0cc04752ba010929070849", size = 9942533 }
+sdist = { url = "https://files.pythonhosted.org/packages/6e/ef/1e0ccec8641743b290bc213acfeac248b06868863a13572c4e84c902f4c0/sqlmesh-0.187.3.tar.gz", hash = "sha256:b10c125bc68b92c668a3f548a6a2bddcd29608e42c187f0f24b3d31a69fa7587", size = 9955645 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/be/a3/48ff069c86108588f894f97a7a3ce5a770abec64530d45e535b5f83a9a54/sqlmesh-0.186.1-py3-none-any.whl", hash = "sha256:1d14bc50cca4666783513bb93a2067c4d6625bd49d6297cc6c91251eca327d8d", size = 5425023 },
+    { url = "https://files.pythonhosted.org/packages/6e/17/c0585d4697bb24c745d044970b7b40ed979c3c6f0d977175b08172dedb30/sqlmesh-0.187.3-py3-none-any.whl", hash = "sha256:3e3691f4c08111f348925b751c737c2a0ab6af8d5d9c653652c96b2386a4ba84", size = 5430273 },
 ]
 
 [package.optional-dependencies]
@@ -1755,7 +1753,7 @@ wheels = [
 
 [[package]]
 name = "typer"
-version = "0.15.4"
+version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -1763,9 +1761,9 @@ dependencies = [
     { name = "shellingham" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6c/89/c527e6c848739be8ceb5c44eb8208c52ea3515c6cf6406aa61932887bf58/typer-0.15.4.tar.gz", hash = "sha256:89507b104f9b6a0730354f27c39fae5b63ccd0c95b1ce1f1a6ba0cfd329997c3", size = 101559 }
+sdist = { url = "https://files.pythonhosted.org/packages/c5/8c/7d682431efca5fd290017663ea4588bf6f2c6aad085c7f108c5dbc316e70/typer-0.16.0.tar.gz", hash = "sha256:af377ffaee1dbe37ae9440cb4e8f11686ea5ce4e9bae01b84ae7c63b87f1dd3b", size = 102625 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c9/62/d4ba7afe2096d5659ec3db8b15d8665bdcb92a3c6ff0b95e99895b335a9c/typer-0.15.4-py3-none-any.whl", hash = "sha256:eb0651654dcdea706780c466cf06d8f174405a659ffff8f163cfbfee98c0e173", size = 45258 },
+    { url = "https://files.pythonhosted.org/packages/76/42/3efaf858001d2c2913de7f354563e3a3a2f0decae3efe98427125a8f441e/typer-0.16.0-py3-none-any.whl", hash = "sha256:1f79bed11d4d02d4310e3c1b7ba594183bcedb0ac73b27a9e5f28f6fb5b98855", size = 46317 },
 ]
 
 [[package]]
@@ -2034,9 +2032,9 @@ wheels = [
 
 [[package]]
 name = "zipp"
-version = "3.21.0"
+version = "3.22.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3f/50/bad581df71744867e9468ebd0bcd6505de3b275e06f202c2cb016e3ff56f/zipp-3.21.0.tar.gz", hash = "sha256:2c9958f6430a2040341a52eb608ed6dd93ef4392e02ffe219417c1b28b5dd1f4", size = 24545 }
+sdist = { url = "https://files.pythonhosted.org/packages/12/b6/7b3d16792fdf94f146bed92be90b4eb4563569eca91513c8609aebf0c167/zipp-3.22.0.tar.gz", hash = "sha256:dd2f28c3ce4bc67507bfd3781d21b7bb2be31103b51a4553ad7d90b84e57ace5", size = 25257 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b7/1a/7e4798e9339adc931158c9d69ecc34f5e6791489d469f5e50ec15e35f458/zipp-3.21.0-py3-none-any.whl", hash = "sha256:ac1bbe05fd2991f160ebce24ffbac5f6d11d83dc90891255885223d42b3cd931", size = 9630 },
+    { url = "https://files.pythonhosted.org/packages/ad/da/f64669af4cae46f17b90798a827519ce3737d31dbafad65d391e49643dc4/zipp-3.22.0-py3-none-any.whl", hash = "sha256:fe208f65f2aca48b81f9e6fd8cf7b8b32c26375266b009b413d45306b6148343", size = 9796 },
 ]
