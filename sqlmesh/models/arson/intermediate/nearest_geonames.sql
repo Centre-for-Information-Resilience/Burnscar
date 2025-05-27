@@ -1,5 +1,5 @@
 MODEL (
-  name arson.int_nearest_geonames_@source_table,
+  name intermediate.nearest_geonames_@source_table,
   description 'Find the nearest geoname settlement for each FIRMS event.',
   kind VIEW,
   blueprints (
@@ -16,8 +16,8 @@ WITH distances AS (
     s.@id_col,
     g.name AS settlement_name,
     ST_DISTANCE(s.geom, g.geom) AS distance
-  FROM arson.int_@source_table AS s
-  LEFT JOIN arson.ref_geonames AS g
+  FROM intermediate.@source_table AS s
+  LEFT JOIN reference.geonames AS g
     ON ST_DWITHIN(s.geom, g.geom, 300000 /* limit to 30km */)
 ), ranked AS (
   SELECT
@@ -26,8 +26,8 @@ WITH distances AS (
   FROM distances
 )
 SELECT
-  @id_col,
-  settlement_name
+  @id_col, /* Column to match FIRMS detection or cluster on */
+  settlement_name /* Name of the nearest geoname settlement */
 FROM ranked
 WHERE
   rn = 1

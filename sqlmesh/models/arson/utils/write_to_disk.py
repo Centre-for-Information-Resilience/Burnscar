@@ -7,7 +7,6 @@ from sqlmesh.core.model import ModelKindName
 
 
 @model(
-    name="arson.util_write_to_disk",
     kind=ModelKindName.FULL,
     description="Final outputs: output.csv (with added social links), output_clustered.csv (clusters of detections)",
     columns={"firms_id": "int"},
@@ -24,7 +23,7 @@ def write_outputs_to_disk(
     output_path.mkdir(parents=True, exist_ok=True)
 
     # get output table
-    output_table = context.resolve_table("arson.mart_firms_validated")
+    output_table = context.resolve_table("mart.firms_validated")
     output_df = context.fetchdf(f"select * from {output_table}")
 
     # add social links
@@ -37,7 +36,7 @@ def write_outputs_to_disk(
     )
     output_with_links_df.to_csv(output_path / "output.csv", index=False)
 
-    clustered_table = context.resolve_table("arson.mart_firms_validated_clustered")
+    clustered_table = context.resolve_table("mart.firms_validated_clustered")
     clustered_df = context.fetchdf(f"select * from {clustered_table}")
     clustered_df_with_links_df = add_links(
         clustered_df,

@@ -1,5 +1,5 @@
 MODEL (
-  name arson.int_firms_to_validate_@{try_},
+  name intermediate.firms_to_validate_@{try_},
   kind VIEW,
   description "FIRMS events pending a retry of validation.",
   blueprints ((try_ := 0, day_ := 11), (try_ := 1, day_ := 16), (try_ := 2, day_ := 21))
@@ -9,7 +9,7 @@ MODEL (
 
 SELECT
   *
-FROM arson.int_firms_to_validate
+FROM arson.intermediate.firms_to_validate
 WHERE
   @AND(
     (
@@ -23,7 +23,7 @@ WHERE
         firms_id IN (
           SELECT DISTINCT
             firms_id
-          FROM arson.int_firms_validated_@{validated_try}
+          FROM arson.intermediate.firms_validated_@{validated_try}
           WHERE
             (
               no_data OR too_cloudy

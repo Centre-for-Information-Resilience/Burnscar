@@ -5,12 +5,14 @@ gateways:
       # https://sqlmesh.readthedocs.io/en/stable/reference/configuration/#connections
       # https://sqlmesh.readthedocs.io/en/stable/integrations/engines/duckdb/#connection-options
       type: duckdb
-      database: db.db
+      # database: db.db
       # concurrent_tasks: 4
       # register_comments: True
       # pre_ping: False
       pretty_sql: True
-      # catalogs:
+      catalogs:
+        arson: "arson.db"
+
       extensions:
         - spatial
       # connector_config:
@@ -18,9 +20,16 @@ gateways:
 
 default_gateway: duckdb
 
+model_naming:
+  infer_names: true
+
 model_defaults:
   dialect: duckdb
-  start: 2025-03-01
+  start: 2025-05-01
+
+linter:
+  enabled: False
+  rules: "ALL"
 
 variables:
   # settings
@@ -49,4 +58,4 @@ variables:
 
   paths_areas:
     include: ../geo/include.gpkg
-    exclude: ../geo/exclude.gpkg
+    exclude:
