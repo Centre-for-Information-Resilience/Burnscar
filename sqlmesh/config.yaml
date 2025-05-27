@@ -5,13 +5,11 @@ gateways:
       # https://sqlmesh.readthedocs.io/en/stable/reference/configuration/#connections
       # https://sqlmesh.readthedocs.io/en/stable/integrations/engines/duckdb/#connection-options
       type: duckdb
-      # database: db.db
+      database: db.duckdb
       # concurrent_tasks: 4
       # register_comments: True
       # pre_ping: False
       pretty_sql: True
-      catalogs:
-        arson: "arson.db"
 
       extensions:
         - spatial

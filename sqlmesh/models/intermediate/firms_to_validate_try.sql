@@ -9,7 +9,7 @@ MODEL (
 
 SELECT
   *
-FROM arson.intermediate.firms_to_validate
+FROM intermediate.firms_to_validate
 WHERE
   @AND(
     (
@@ -23,7 +23,7 @@ WHERE
         firms_id IN (
           SELECT DISTINCT
             firms_id
-          FROM arson.intermediate.firms_validated_@{validated_try}
+          FROM intermediate.firms_validated_@{validated_try}
           WHERE
             (
               no_data OR too_cloudy

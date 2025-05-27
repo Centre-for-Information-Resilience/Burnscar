@@ -11,6 +11,6 @@ SELECT
   f.acq_date,
   ST_ASWKB(f.geom)::BLOB AS geom,
   ST_ASWKB(i.geom)::BLOB AS area_include_geom
-FROM arson.intermediate.firms AS f
-JOIN arson.reference.areas_include AS i
+FROM intermediate.firms AS f
+JOIN reference.areas_include AS i
   ON ST_INTERSECTS(f.geom, i.geom)
