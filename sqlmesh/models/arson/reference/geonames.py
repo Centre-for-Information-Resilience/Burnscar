@@ -8,7 +8,6 @@ from sqlmesh.core.model import ModelKindName
 
 
 @model(
-    name="arson.ref_geonames",
     kind=ModelKindName.FULL,
     is_sql=True,
     post_statements=[

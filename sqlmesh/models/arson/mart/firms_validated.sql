@@ -1,5 +1,4 @@
 MODEL (
-  name arson.mart_firms_validated,
   kind VIEW,
   description 'Final output of the pipeline, including all relevant information for each FIRMS event.',
   audits (
@@ -27,18 +26,18 @@ SELECT
   v.burn_scar_detected,
   v.burnt_pixel_count,
   v.burnt_building_count
-FROM arson.int_firms AS f
-JOIN arson.ref_areas_include AS i
+FROM intermediate.firms AS f
+JOIN reference.areas_include AS i
   ON ST_INTERSECTS(f.geom, i.geom)
-JOIN arson.int_firms_validated AS v
+JOIN intermediate.firms_validated AS v
   ON f.id = v.firms_id
-JOIN arson.int_firms_validated_clustered AS fvc
+JOIN intermediate.firms_validated_clustered AS fvc
   ON i.id = fvc.area_include_id
   AND f.acq_date >= fvc.start_date
   AND f.acq_date <= fvc.end_date
-LEFT JOIN arson.int_nearest_geonames_firms_validated AS ng
+LEFT JOIN intermediate.nearest_geonames_firms_validated AS ng
   ON f.id = ng.firms_id
-JOIN arson.ref_gadm AS g
+JOIN reference.gadm AS g
   ON ST_INTERSECTS(f.geom, g.geom)
 ORDER BY
   i.id,

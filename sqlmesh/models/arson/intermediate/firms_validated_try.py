@@ -84,7 +84,7 @@ def validate(
 
 
 @model(
-    name="arson.int_firms_validated_0",
+    name="intermediate.firms_validated_0",
     kind=KIND,
     columns=COLUMNS,
 )
@@ -94,7 +94,7 @@ def firms_validated_try_0(
     end: datetime.datetime,
     **kwargs: dict[str, t.Any],
 ) -> t.Generator[pd.DataFrame, None, None]:
-    firms_to_validate_table = context.resolve_table("arson.int_firms_to_validate_0")
+    firms_to_validate_table = context.resolve_table("intermediate.firms_to_validate_0")
 
     yield from validate(
         context=context,
@@ -106,7 +106,7 @@ def firms_validated_try_0(
 
 
 @model(
-    name="arson.int_firms_validated_1",
+    name="intermediate.firms_validated_1",
     kind=KIND,
     columns=COLUMNS,
 )
@@ -116,7 +116,7 @@ def firms_validated_try_1(
     end: datetime.datetime,
     **kwargs: dict[str, t.Any],
 ) -> t.Generator[pd.DataFrame, None, None]:
-    firms_to_validate_table = context.resolve_table("arson.int_firms_to_validate_1")
+    firms_to_validate_table = context.resolve_table("intermediate.firms_to_validate_1")
 
     yield from validate(
         context=context,
@@ -128,7 +128,7 @@ def firms_validated_try_1(
 
 
 @model(
-    name="arson.int_firms_validated_2",
+    name="intermediate.firms_validated_2",
     kind=KIND,
     columns=COLUMNS,
 )
@@ -138,7 +138,7 @@ def firms_validated_try_2(
     end: datetime.datetime,
     **kwargs: dict[str, t.Any],
 ) -> t.Generator[pd.DataFrame, None, None]:
-    firms_to_validate_table = context.resolve_table("arson.int_firms_to_validate_2")
+    firms_to_validate_table = context.resolve_table("intermediate.firms_to_validate_2")
 
     yield from validate(
         context=context,
