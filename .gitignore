@@ -6,8 +6,8 @@
 .cache
 .vscode
 logs
-*.db
-*.db.wal
+*.duckdb
+*.duckdb.wal
 **/*.pyc
 __pycache__
 __marimo__
