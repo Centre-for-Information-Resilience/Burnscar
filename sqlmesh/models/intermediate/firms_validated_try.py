@@ -1,6 +1,6 @@
 import datetime
-import os
 import typing as t
+from pathlib import Path
 
 import pandas as pd
 from dotenv import load_dotenv
@@ -48,14 +48,12 @@ def validate(
 
     # set up validator
     load_dotenv()
+    ee_key_path = context.var("ee_key_path")
+    assert ee_key_path, "ee_key_path must be set in config"
+    ee_key_path = Path(ee_key_path)
+    assert ee_key_path.exists(), f"Earth Engine key file is missing: {ee_key_path}"
 
-    ee_project = os.getenv("EARTH_ENGINE_PROJECT_ID")
-    assert ee_project, "GEE project id not set in .env file"
-
-    ee_api_key = os.getenv("EARTH_ENGINE_API_KEY")
-    assert ee_api_key, "GEE API key not set in .env file"
-
-    validator = GEEValidator(project=ee_project, api_key=ee_api_key)
+    validator = GEEValidator(key_path=ee_key_path)
 
     # get validation params
     validation_params = context.var("validation_params", {})

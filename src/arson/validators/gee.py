@@ -1,6 +1,8 @@
 import datetime
+import json
 import logging
 import typing as t
+from pathlib import Path
 
 import ee
 from pydantic import BaseModel
@@ -9,6 +11,10 @@ from ..models import FireDetection
 from ..utils import expect_type
 
 logger = logging.getLogger(__name__)
+
+
+def read_key(key_path: Path) -> dict[str, str]:
+    return json.loads(key_path.read_text())
 
 
 class ValidationImages(BaseModel):
@@ -42,8 +48,14 @@ class ValidationResult(BaseModel):
 
 
 class GEEValidator:
-    def __init__(self, project: str, api_key: str):
-        ee.Initialize(project=project, cloud_api_key=api_key)
+    def __init__(self, key_path: Path):
+        key = read_key(key_path)
+        service_account = key["client_email"]
+        project_id = key["project_id"]
+        print(f"Project: {project_id}")
+        print(f"Sevice account: {service_account}")
+        credentials = ee.ServiceAccountCredentials(service_account, str(key_path))
+        ee.Initialize(credentials=credentials, project=project_id)
 
         self._define_collections()
 
