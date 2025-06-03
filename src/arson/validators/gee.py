@@ -52,8 +52,6 @@ class GEEValidator:
         key = read_key(key_path)
         service_account = key["client_email"]
         project_id = key["project_id"]
-        print(f"Project: {project_id}")
-        print(f"Sevice account: {service_account}")
         credentials = ee.ServiceAccountCredentials(service_account, str(key_path))
         ee.Initialize(credentials=credentials, project=project_id)
 
