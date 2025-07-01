@@ -4,7 +4,7 @@ from pathlib import Path
 
 import typer
 
-app = typer.Typer(name="arson", help="CLI for Arson, a SQLMesh project.")
+app = typer.Typer(name="burnscar", help="CLI for Burnscar, a SQLMesh project.")
 
 
 def ensure_sqlmesh_root():

@@ -1,9 +1,9 @@
-# 🔥 Arson Detection Pipeline
+# 🔥 Burnscar Detection Pipeline
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
-This project identifies potential arson incidents using NASA FIRMS active fire alerts, filtered and validated with post-event burn scar imagery from Copernicus Sentinel-2. It uses geospatial joins, temporal validation, and clustering to produce a reliable dataset of suspicious fires. The data pipeline is powered by **[SQLMesh](https://sqlmesh.com/)**.
+This project identifies potential burnscar incidents using NASA FIRMS active fire alerts, filtered and validated with post-event burn scar imagery from Copernicus Sentinel-2. It uses geospatial joins, temporal validation, and clustering to produce a reliable dataset of suspicious fires. The data pipeline is powered by **[SQLMesh](https://sqlmesh.com/)**.
 
 ---
 
@@ -22,7 +22,7 @@ This project identifies potential arson incidents using NASA FIRMS active fire a
 Before you begin:
 
 - **NASA FIRMS API key**: [Get it here](https://firms.modaps.eosdis.nasa.gov/api/map_key/)
-- **Google Earth Engine access**: [Request access](https://developers.google.com/earth-engine/guides/access)
+- **Google Earth Engine access**: [Request access](https://earthengine.google.com/noncommercial/)
 - [uv](https://github.com/astral-sh/uv) (for dependency management)
 
 ---
@@ -75,12 +75,12 @@ For configuration of the project refer to the SQLMesh [config file](./sqlmesh/co
 ### 3. Run the SQLMesh pipeline
 
 ```bash
-uv run arson run
+uv run burnscar run
 ```
 or 
 ```bash
 source .venv/bin/activate
-arson run
+burnscar run
 ```
 
 ### 4. Inspect the results
@@ -100,7 +100,7 @@ arson run
 data/               # GADM admin boundary data
 geo/                # Custom spatial boundaries and settlements
 sqlmesh/            # SQLMesh config, models, macros
-src/arson/          # Python source (fetchers, validators, logic)
+src/burnscar/          # Python source (fetchers, validators, logic)
 output/             # Final exported datasets
 docs/               # Validation scripts & diagrams
 ```
@@ -142,8 +142,8 @@ MIT License — free to use, modify, and distribute.
 > For my own convenience, I've added a line print(f"Currently checking for date {current_date}") in the While loop at the end, so that I can see where the script currently is. Note that "current date" means a period of 10 days up to that date. (If this line does not already exists in the shared script) 
 > Note that the script continues even after reaching the current day. I stop running as soon the script returns no new entries/current date is 10 days over the last date I want to include in the period.
 
-> ### Arson analyser
-> Feed the CSV output from step 1 to Arson_Analyser_Latest_update 
+> ### Burnscar analyser
+> Feed the CSV output from step 1 to Burnscar_Analyser_Latest_update 
 > There's 3 things you need to do before you can run this script: 
 > - Create a Google Earth Engine project name in line 70, you can create a project here, 
 > - Edit the base directory in line 16
@@ -163,7 +163,7 @@ MIT License — free to use, modify, and distribute.
 > [Next run, minimal 5 days later] Second run for the 'too cloudy' and 'no image' entries (this process is shown by the red dotted lines in the flow chart)
 > - Run the DataFetcher (see step 1) for the period that covers all remaining entries from 3i
 > - Filter the DataFetcher output so that only detections remain that are also in the list with remaining entries from 3i (I do this in Google Sheets, I can explain this if you want me to)
-> - Feed the filtered csv from step b to the Arson Analyse (step 2)
+> - Feed the filtered csv from step b to the Burnscar Analyse (step 2)
 > - Follow the steps under 3 for the output, with the exception of step 3i (as this is the second time results come back as no image/too cloudy). Keep the remaining data for step 5.
 
 > Manually analyse the remaining point on a map
@@ -175,14 +175,14 @@ MIT License — free to use, modify, and distribute.
 
 > ## Suggested priorities:
 
-> Prio's 1a,b,c are related and should be ordered or merged if more convenient, but if I have to order them, then prio 1a would have the highest priority, and then b,c. This is in lesser extent also true for prio 2 and 3. Important note: It seems that the Arson Analyser stops checking for new Sentinel-2 imagery after there's no good imagery available for more than a number of days after the incident. I'll double check this with Micheal/***REMOVED***, who have been working on both scripts. It would be good to know if it makes sense to extent this period for a bit, as I now still get more than 50% back with no image in the second run.
+> Prio's 1a,b,c are related and should be ordered or merged if more convenient, but if I have to order them, then prio 1a would have the highest priority, and then b,c. This is in lesser extent also true for prio 2 and 3. Important note: It seems that the Burnscar Analyser stops checking for new Sentinel-2 imagery after there's no good imagery available for more than a number of days after the incident. I'll double check this with Micheal/***REMOVED***, who have been working on both scripts. It would be good to know if it makes sense to extent this period for a bit, as I now still get more than 50% back with no image in the second run.
 
-> - Prio 1a: Edit the Arson Analyser script so that there is a second output with all detections that come back as 'too cloud' or 'no image' in the same format as the input (saves step 4a-4c)
-> - Prio 1b: Edit the Arson Analyser script so that it also works through the second output from prio 1a on request, while still having an output that distinguishes between these and the 'new' detections
-> - Prio 1c: Merge the DataFetcher script with the Arson Analyser so that you only have to run one script instead of two, preferably by selecting a specific period you want to check (merges steps 1 and 2)
+> - Prio 1a: Edit the Burnscar Analyser script so that there is a second output with all detections that come back as 'too cloud' or 'no image' in the same format as the input (saves step 4a-4c)
+> - Prio 1b: Edit the Burnscar Analyser script so that it also works through the second output from prio 1a on request, while still having an output that distinguishes between these and the 'new' detections
+> - Prio 1c: Merge the DataFetcher script with the Burnscar Analyser so that you only have to run one script instead of two, preferably by selecting a specific period you want to check (merges steps 1 and 2)
 > - Prio 2a: Remove duplicate detections within the same boundary (if this is done before the process in GEE, this saves time/resources as well). The downside is that we then have to check for other detections within the same boundary on the same day, but I think this is more efficient. (saves step 3d)
 > - Prio 2b: Merge (preferred way, e.g. by adding a column with number of days) and/or remove duplicate detections within the same boundary on subsequent days (saves time in the final verification process)
-> - Prio 3: Edit the Arson Analyser script so that the first columns of the output are the same as column E-P (with column E on "In Progress" and F-J empty) in the 'Main' tab of the fire sheet (saves step 3f) 
+> - Prio 3: Edit the Burnscar Analyser script so that the first columns of the output are the same as column E-P (with column E on "In Progress" and F-J empty) in the 'Main' tab of the fire sheet (saves step 3f) 
 > Anything else flagged by Lewis after reading through the steps and looking at scripts etc.
 
 > Other potential improvements: 
