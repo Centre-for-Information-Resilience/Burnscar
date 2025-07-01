@@ -1,8 +1,8 @@
 from pathlib import Path
 
+from burnscar.fetchers.gadm import ensure_gadm
 from sqlglot import exp
 
-from arson.fetchers.gadm import ensure_gadm
 from sqlmesh import ExecutionContext, model
 from sqlmesh.core.model import ModelKindName
 
