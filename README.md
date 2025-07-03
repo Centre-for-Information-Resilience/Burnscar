@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
-This project identifies potential burnscar incidents using NASA FIRMS active fire alerts, filtered and validated with post-event burn scar imagery from Copernicus Sentinel-2. It uses geospatial joins, temporal validation, and clustering to produce a reliable dataset of suspicious fires. The data pipeline is powered by **[SQLMesh](https://sqlmesh.com/)**.
+This project identifies potential arson incidents using NASA FIRMS active fire alerts, filtered and validated with post-event burn scar imagery from Copernicus Sentinel-2. It uses geospatial joins, temporal validation, and clustering to produce a reliable dataset of suspicious fires. The data pipeline is powered by **[SQLMesh](https://sqlmesh.com/)**.
 
 ---
 
@@ -21,9 +21,14 @@ This project identifies potential burnscar incidents using NASA FIRMS active fir
 
 Before you begin:
 
-- **NASA FIRMS API key**: [Get it here](https://firms.modaps.eosdis.nasa.gov/api/map_key/)
-- **Google Earth Engine access**: [Request access](https://earthengine.google.com/noncommercial/)
-- [uv](https://github.com/astral-sh/uv) (for dependency management)
+- **NASA FIRMS API key**: Register for a [free API key](https://firms.modaps.eosdis.nasa.gov/api/map_key/). This is required to fetch fire detections from the NASA API. Copy [example.env](./example.env) to [.env](./.env) and fill in your acquired API key.
+- **Google Earth Engine access**: We use Google Earth Engine to provide and analyse imagery from ESA's Sentinel-2 satellite. You need to register a (free for non-commercial) [Earth Engine project](https://developers.google.com/earth-engine/guides/access) on Google Cloud. To get the key follow these steps:
+  1. Go to the [GCP Console](https://console.cloud.google.com) &rarr; Select/Create your project &rarr; APIs \& services &rarr; Google Earth Engine API &rarr; Credentials &rarr; Under Service accounts &rarr; Select/Create service account &rarr; Keys &rarr; Add key &rarr; json
+  2. Put the downloaded json file in the [`./key`](./key/) directory.
+
+
+
+- [uv](https://github.com/astral-sh/uv) (for installation, virtual environment and dependency management)
 
 ---
 
@@ -36,9 +41,9 @@ git clone https://github.com/Centre-for-Information-Resilience/Fire_mapping
 ````
 
 ### 2. Add credentials
+See Requirements section.
 
-To set your API keys, change the `example.env` file to `.env` and fill in your API keys and project ID for FIRMS and Google Earth Engine.
-
+### 3. Configure project
 For configuration of the project refer to the SQLMesh [config file](./sqlmesh/config.yaml). The following configuration options are currently available:
 
 - `model_defaults`:
@@ -64,7 +69,7 @@ For configuration of the project refer to the SQLMesh [config file](./sqlmesh/co
 
     - # paths
     - `path_gadm`: Path to write gadm .gpkg files to
-    - `path_settlements`: Path to settlements .gpkg file
+    - `path_geonames`: Path to write geonames .gpkg file
     - `path_output`: Path to write output to
 
     - `paths_areas`:
@@ -73,14 +78,18 @@ For configuration of the project refer to the SQLMesh [config file](./sqlmesh/co
 
 
 ### 3. Run the SQLMesh pipeline
+For first time usage run:
 
+```bash
+uv run burnscar init
+```
+For subsequent runs you can use:
 ```bash
 uv run burnscar run
 ```
-or 
+These are two cli commands included for convenience, of course you can also just run the SQLMesh project directly. Make sure you're in [`sqlmesh/`](./sqlmesh/) and run:
 ```bash
-source .venv/bin/activate
-burnscar run
+uv run sqlmesh --help
 ```
 
 ### 4. Inspect the results
@@ -109,10 +118,10 @@ docs/               # Validation scripts & diagrams
 
 ## 🗺️ Data Sources
 
-* **FIRMS** – NASA MODIS/VIIRS fire alerts
-* **Copernicus Sentinel-2** – Post-burn surface reflectance
-* **GADM** – Global administrative boundaries
-* **Urban settlements layer** – Custom vector for clustering
+* **FIRMS** – NASA MODIS/VIIRS fire alerts: [nasa.gov](https://firms.modaps.eosdis.nasa.gov/map)
+* **Copernicus Sentinel-2** – Post-burn surface reflectance: Accessed through Google Earth Engine, but can be explored using [Copernicus Browser](https://browser.dataspace.copernicus.eu)
+* **GADM** – Global administrative boundaries: [gadm.org](https://gadm.org/)
+* **GeoNames** - Open database of placenames: [geonames.org](https://www.geonames.org/)
 
 ---
 
