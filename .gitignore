@@ -16,4 +16,4 @@ data/*
 duckdb/*
 geo/*
 output/*
-key/*.json
+key.json

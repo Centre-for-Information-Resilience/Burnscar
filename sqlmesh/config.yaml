@@ -31,7 +31,7 @@ linter:
 
 variables:
   # settings
-  ee_key_path: ../key/key.json
+  ee_key_path: ../key.json
 
   ee_concurrency: 50 # max number of threads used for fetching data from gee. 50 uses ~1.5GB of RAM
   country_id: "SDN"
