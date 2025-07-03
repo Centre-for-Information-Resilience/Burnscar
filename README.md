@@ -24,7 +24,7 @@ Before you begin:
 - **NASA FIRMS API key**: Register for a [free API key](https://firms.modaps.eosdis.nasa.gov/api/map_key/). This is required to fetch fire detections from the NASA API. Copy [example.env](./example.env) to [.env](./.env) and fill in your acquired API key.
 - **Google Earth Engine access**: We use Google Earth Engine to provide and analyse imagery from ESA's Sentinel-2 satellite. You need to register a (free for non-commercial) [Earth Engine project](https://developers.google.com/earth-engine/guides/access) on Google Cloud. To get the key follow these steps:
   1. Go to the [GCP Console](https://console.cloud.google.com) &rarr; Select/Create your project &rarr; APIs \& services &rarr; Google Earth Engine API &rarr; Credentials &rarr; Under Service accounts &rarr; Select/Create service account &rarr; Keys &rarr; Add key &rarr; json
-  2. Put the downloaded json file in the [`./key`](./key/) directory.
+  2. Put the downloaded json file in the root of the project (configurable, default: [key.json](./key.json)).
 
 
 
@@ -49,25 +49,23 @@ For configuration of the project refer to the SQLMesh [config file](./sqlmesh/co
 - `model_defaults`:
   - `start`: Set the start date of the project.
 - `variables`
+    - `ee_key_path`: Path to your Service Account Key (`json`) See Requirements section on how to obtain this file
     - `ee_concurrency`: Max number of threads used for fetching data from gee. 50 uses ~1.5GB of RAM
-    - `country_id`: 3-letter country code
+    - `country_id`: 3-letter ISO country code
     - `gadm_level`: GADM administrative areas level (between 1 and 3). Some countries don't have higher levels available
 
     - `validation_lookback`: How many days back to look when running the pipeline. e.g. 60 will fetch and validate fires up to 60 days ago
 
-    - # validation parameters
     - `validation_params`:
-        - `buffer_distance`: Area in meters around fire to use for validation TODO: Check whether this is actually in meters.
+        - `buffer_distance`: Area in meters around fire to use for validation
         - `days_around`: Days before and after the event to consider for validation
         - `max_cloudy_percentage`: Maximum allowed cloud cover for images used in validation
         - `burnt_pixel_count_threshold`: Required amount of burnt pixels to label as `burn_scar_detected`
         - `nbr_after_lte`: -0.10
         - `nbr_difference_limit`: 0.15
 
-    - # clustering
     - `clustering_max_date_gap`: Maximum gap between two consecutive FIRMS events used for clustering
 
-    - # paths
     - `path_gadm`: Path to write gadm .gpkg files to
     - `path_geonames`: Path to write geonames .gpkg file
     - `path_output`: Path to write output to
@@ -94,7 +92,7 @@ uv run sqlmesh --help
 
 ### 4. Inspect the results
 
-- Outputs are saved in the `output/` folder:
+- Outputs are saved in the configured directory:
   - `firms_output.csv`: all validated fire detections
   - `output_clustered.csv`: clustered detections by date and location
 - You can explore the `sqlmesh/db.db` database with:
@@ -109,7 +107,6 @@ uv run sqlmesh --help
 docs/               # DAG Schema and validation notebook
 sqlmesh/            # SQLMesh config, models, macros
 src/burnscar/       # Python source (fetchers, validators, logic)
-docs/               # Validation scripts & diagrams
 ```
 
 ---

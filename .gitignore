@@ -12,8 +12,8 @@ logs
 __pycache__
 __marimo__
 
-data/*
-duckdb/*
-geo/*
-output/*
+data
+duckdb
+geo
+output
 key.json
