@@ -27,30 +27,30 @@ linter:
 
 model_defaults:
   dialect: duckdb
-  start: 2025-05-01
+  start: 2025-06-20
 
 variables:
   # Google Earth Engine
-  ee_key_path: ../key.json
+  ee_key_path: ../key.json # Path to the json file containing a key of a GCP Service Principal with permissions to access your Earth Engine project
   ee_concurrency: 50 # max number of threads used for fetching data from gee. 50 uses ~1.5GB of RAM
 
   # Project settings
-  country_id: "SDN"
-  gadm_level: 3
+  country_id: "SDN" # ISO 3-letter country code
+  gadm_level: 3 # This needs to match a level available from https://gadm.org
 
   validation_lookback: 60
 
   # validation parameters
   validation_params:
-    buffer_distance: 1000
-    days_around: 30
-    max_cloudy_percentage: 20
-    burnt_pixel_count_threshold: 10
-    nbr_after_lte: -0.10
-    nbr_difference_limit: 0.15
+    buffer_distance: 1000 # area to buffer around the fire detection to use for validation
+    days_around: 30 # Days before & after the event to consider for validation. This gives some play in case of cloud coverage
+    max_cloudy_percentage: 20 # Maximum percentage of the area of interest that may be covered by clouds
+    burnt_pixel_count_threshold: 10 # Minimum number of burnt pixels to consider the event as burn scar
+    max_nbr_after: -0.10 # The maximum allowed value of the Normalized Burn Ratio for the after image, used for classifying pixels as burnt
+    min_nbr_difference: 0.15 # THe minimum difference in Normalized Burn Ratio between the before and after image
 
   # clustering
-  clustering_max_date_gap: 2
+  clustering_max_date_gap: 2 # Maximum number of days since the previous event to be considered as the same cluster
 
   # paths
   path_gadm: ../data/gadm

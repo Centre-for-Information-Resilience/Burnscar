@@ -61,8 +61,8 @@ For configuration of the project refer to the SQLMesh [config file](./sqlmesh/co
         - `days_around`: Days before and after the event to consider for validation
         - `max_cloudy_percentage`: Maximum allowed cloud cover for images used in validation
         - `burnt_pixel_count_threshold`: Required amount of burnt pixels to label as `burn_scar_detected`
-        - `nbr_after_lte`: -0.10
-        - `nbr_difference_limit`: 0.15
+        - `max_nbr_after`: -0.10
+        - `min_nbr_difference`: 0.15
 
     - `clustering_max_date_gap`: Maximum gap between two consecutive FIRMS events used for clustering
 
