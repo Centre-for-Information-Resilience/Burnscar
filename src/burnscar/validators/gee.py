@@ -105,8 +105,8 @@ class GEEValidator:
         days_around: int = 30,
         max_cloudy_percentage: int = 20,
         burnt_pixel_count_threshold: int = 10,
-        nbr_after_lte: float = -0.10,
-        nbr_difference_limit: float = 0.15,
+        max_nbr_after: float = -0.10,
+        min_nbr_difference: float = 0.15,
     ) -> ValidationResult:
         result = ValidationResult(
             firms_id=detection.firms_id, acq_date=detection.acq_date
@@ -148,7 +148,7 @@ class GEEValidator:
         # calculate difference in NBR and create a mask using some threshold
         nbr_difference = self._get_nbr_difference(before_image, after_image)
         nbr_mask = self._get_nbr_mask(
-            after_image, nbr_difference, nbr_after_lte, nbr_difference_limit
+            after_image, nbr_difference, max_nbr_after, min_nbr_difference
         )
 
         nbr_masked = nbr_difference.updateMask(nbr_mask)
@@ -191,11 +191,11 @@ class GEEValidator:
     def _get_nbr_mask(
         after_image: Image,
         nbr_difference: Image,
-        nbr_after_lte: float,
-        nbr_difference_limit: float,
+        max_nbr_after: float,
+        min_nbr_difference: float,
     ) -> Image:
-        nbr_mask = nbr_difference.gte(nbr_difference_limit).And(
-            after_image.select("NBR").lte(nbr_after_lte)
+        nbr_mask = nbr_difference.gte(min_nbr_difference).And(
+            after_image.select("NBR").lte(max_nbr_after)
         )
         return nbr_mask
 
