@@ -2,7 +2,6 @@ import typing as t
 from pathlib import Path
 
 from burnscar.linkgen import add_links
-
 from sqlmesh import ExecutionContext, model
 from sqlmesh.core.model import ModelKindName
 
@@ -11,7 +10,7 @@ from sqlmesh.core.model import ModelKindName
     kind=ModelKindName.FULL,
     description="Final outputs: output.csv (with added social links), output_clustered.csv (clusters of detections)",
     columns={"firms_id": "int"},
-    enabled=True,
+    enabled=False,
 )
 def write_outputs_to_disk(
     context: ExecutionContext,
