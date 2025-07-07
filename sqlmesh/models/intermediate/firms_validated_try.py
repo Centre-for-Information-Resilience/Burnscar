@@ -3,10 +3,10 @@ import typing as t
 from pathlib import Path
 
 import pandas as pd
-from burnscar.models import FireDetection
-from burnscar.validators.gee import GEEValidator
 from dotenv import load_dotenv
 
+from burnscar.models import FireDetection
+from burnscar.validators.gee import GEEValidator
 from sqlmesh import ExecutionContext, model
 from sqlmesh.core.model import ModelKindName
 
