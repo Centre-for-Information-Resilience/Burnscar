@@ -1,0 +1,16 @@
+MODEL (
+  kind VIEW,
+  description "FIRMS events pending validation.",
+  audits (
+    NUMBER_OF_ROWS(threshold := 1)
+  )
+);
+
+SELECT
+  f.id AS firms_id,
+  f.acq_date,
+  ST_ASWKB(f.geom)::BLOB AS geom,
+  ST_ASWKB(i.geom)::BLOB AS area_include_geom
+FROM intermediate.firms AS f
+JOIN reference.areas_include AS i
+  ON ST_INTERSECTS(f.geom, i.geom)
