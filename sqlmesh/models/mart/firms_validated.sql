@@ -16,6 +16,7 @@ SELECT
   @IF(@gadm_level >= 2, g.gadm_2),
   @IF(@gadm_level >= 3, g.gadm_3),
   ng.settlement_name,
+  ng.settlement_distance,
   i.id AS area_include_id,
   fvc.event_no,
   v.before_date,

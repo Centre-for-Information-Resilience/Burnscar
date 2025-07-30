@@ -39,7 +39,7 @@ from sqlmesh.core.model import ModelKindName
     },
     audits=[("number_of_rows", {"threshold": 1})],
 )
-def fetch_nasa_data(
+def nasa_firms(
     context: ExecutionContext,
     start: datetime.datetime,
     end: datetime.datetime,
@@ -55,15 +55,12 @@ def fetch_nasa_data(
     fetcher = NASAFetcher(api_key=api_key_nasa)
 
     dfs = []
-
-    # one fetch per date
     dates = date_range(start.date(), end.date())
 
     for date in dates:
         data = fetcher.fetch(country_id, date)
         dfs.append(fetcher.to_dataframe(data))
 
-    # Concatenate all dataframes into one
     df = pd.concat(dfs, ignore_index=True)
 
     if df.empty:
