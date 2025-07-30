@@ -3,10 +3,10 @@ import os
 import typing as t
 
 import pandas as pd
-from burnscar.fetchers.nasa import NASAFetcher
-from burnscar.utils import date_range
 from dotenv import load_dotenv
 
+from burnscar.fetchers.nasa import NASAFetcher
+from burnscar.utils import date_range
 from sqlmesh import ExecutionContext, model
 from sqlmesh.core.model import ModelKindName
 
@@ -37,6 +37,7 @@ from sqlmesh.core.model import ModelKindName
         "bright_ti5": "double",
         "confidence": "text",
     },
+    audits=[("number_of_rows", {"threshold": 1})],
 )
 def fetch_nasa_data(
     context: ExecutionContext,
