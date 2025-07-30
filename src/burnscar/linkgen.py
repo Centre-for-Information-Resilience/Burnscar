@@ -42,7 +42,7 @@ def copernicus(
 
     base_url = "https://browser.dataspace.copernicus.eu/?"
     query = dict(
-        zoom=14,
+        zoom=16,
         lat=latitude,
         lng=longitude,
         themeId="DEFAULT-THEME",
