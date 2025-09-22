@@ -128,3 +128,10 @@ src/burnscar/       # Python source (fetchers, validators, logic)
 ## 📜 License
 
 MIT License — free to use, modify, and distribute.
+
+## 🌟 Credits
+This project was made possible thanks to the foundational research and work of:
+- [Michael Cruickshank](https://github.com/MJCruickshank)
+- Mustafa A
+- [Tarig Ali](https://github.com/tariqabuobeida)
+- Mark Snoeck
