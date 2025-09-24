@@ -1,5 +1,5 @@
 MODEL (
-  name intermediate.firms_to_validate_@{try_},
+  name intermediate.firms_to_validate_@{try_}, /* Model name is dynamic */
   kind VIEW,
   description "FIRMS events pending a retry of validation.",
   blueprints ((try_ := 0, day_ := 11), (try_ := 1, day_ := 16), (try_ := 2, day_ := 21))
@@ -23,6 +23,7 @@ WHERE
         firms_id IN (
           SELECT DISTINCT
             firms_id
+          /* Depend on output of the previous try */
           FROM intermediate.firms_validated_@{validated_try}
           WHERE
             (

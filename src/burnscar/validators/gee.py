@@ -63,15 +63,6 @@ class GEEValidator:
         credentials = ServiceAccountCredentials(service_account, str(key_path))
         Initialize(credentials=credentials, project=project_id)
 
-    @staticmethod
-    def _get_buildings(filter_bounds: Geometry) -> FeatureCollection:
-        buildings = (
-            FeatureCollection("GOOGLE/Research/open-buildings/v3/polygons")
-            .filter("confidence >= 0.75")
-            .filterBounds(filter_bounds)
-        )
-        return buildings
-
     def validate_many(
         self,
         detections: list[FireDetection],
@@ -186,6 +177,15 @@ class GEEValidator:
             result.burn_scar_detected = True
 
         return result
+
+    @staticmethod
+    def _get_buildings(filter_bounds: Geometry) -> FeatureCollection:
+        buildings = (
+            FeatureCollection("GOOGLE/Research/open-buildings/v3/polygons")
+            .filter("confidence >= 0.75")
+            .filterBounds(filter_bounds)
+        )
+        return buildings
 
     @staticmethod
     def _get_nbr_mask(
@@ -306,7 +306,7 @@ class GEEValidator:
         image_collection: ImageCollection,
         date: datetime.date,
     ) -> Image:
-        before_image = (
+        image = (
             image_collection.filterDate(
                 str(date), str(date + datetime.timedelta(days=1))
             )
@@ -314,7 +314,7 @@ class GEEValidator:
             .clip(clipping_bounds)
         )
 
-        return before_image
+        return image
 
     @staticmethod
     def _get_image_dates(image_collection: ImageCollection) -> list[datetime.date]:

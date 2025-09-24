@@ -6,6 +6,8 @@ import typer
 
 from sqlmesh.core.context import Context
 
+from . import linkgen
+
 app = typer.Typer(name="burnscar", help="CLI for Burnscar, a SQLMesh project.")
 
 
@@ -39,7 +41,9 @@ def run():
 
 
 @app.command()
-def export(path: Path = typer.Option(None)) -> None:
+def export(
+    path: Path = typer.Option(None), add_links: bool = typer.Option(False)
+) -> None:
     ensure_sqlmesh_root()
     context = Context(paths=["."])
     engine = context.engine_adapter
@@ -50,25 +54,33 @@ def export(path: Path = typer.Option(None)) -> None:
     try:
         with engine.connection as conn:
             table = context.resolve_table("mart.firms_validated")
-            conn.execute(f"""
-                            COPY {table}
-                            TO '{path}/output.csv' WITH (
-                            HEADER,
-                            DELIMITER ',')
-                        """)
+            output = conn.execute(f"SELECT * FROM {table}").fetchdf()
 
             table = context.resolve_table("mart.firms_validated_clustered")
-            conn.execute(f"""
-                            COPY {table}
-                            TO '{path}/output_clustered.csv' WITH (
-                            HEADER,
-                            DELIMITER ',')
-                        """)
+            output_clustered = conn.execute(f"SELECT * FROM {table}").fetchdf()
+
+            # add social links
+            gadm_levels = [c for c in output.columns if c.startswith("gadm_")]
+            keyword_cols = ["settlement_name"] + gadm_levels
+
+            if add_links:
+                output = linkgen.add_links(
+                    output, id_columns=["firms_id"], keyword_cols=keyword_cols
+                )
+                output_clustered = linkgen.add_links(
+                    output_clustered,
+                    id_columns=["area_include_id", "event_no"],
+                    keyword_cols=keyword_cols,
+                )
+
+            output.to_csv(f"{path}/output.csv")
+            output_clustered.to_csv(f"{path}/output_clustered.csv")
+
             typer.secho(f"Successfully stored outputs at {path}", fg="green")
 
     except Exception as e:
         typer.secho(f"Failed writing outputs: {e}", err=True, fg="red")
-        sys.exit(1)
+        raise e
 
 
 if __name__ == "__main__":

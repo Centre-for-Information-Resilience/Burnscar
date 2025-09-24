@@ -16,7 +16,8 @@ SELECT
   g.gadm_1,
   @IF(@gadm_level >= 2, g.gadm_2),
   @IF(@gadm_level >= 3, g.gadm_3),
-  ng.settlement_name
+  ng.settlement_name,
+  ng.settlement_distance
 FROM intermediate.firms_validated_clustered AS fvc
 LEFT JOIN intermediate.nearest_geonames_firms_validated_clustered AS ng
   ON fvc.area_include_id = ng.area_include_id

@@ -92,9 +92,10 @@ uv run sqlmesh --help
 
 ### 4. Inspect the results
 
-- Outputs are saved in the configured directory:
-  - `firms_output.csv`: all validated fire detections
-  - `output_clustered.csv`: clustered detections by date and location
+- Outputs are saved in the configured duckdb file:
+  - `mart.firms_output`: all validated fire detections
+  - `mart.output_clustered`: clustered detections by date and location
+- You can export the outputs to the configured dir by running: `burnscar export`
 - You can explore the `sqlmesh/db.db` database with:
   - [DuckDB CLI](https://duckdb.org/2025/03/12/duckdb-ui.html): `duckdb sqlmesh/db.db -ui`
   - [marimo](https://marimo.io): `uvx marimo edit explore.py --sandbox`
@@ -128,3 +129,10 @@ src/burnscar/       # Python source (fetchers, validators, logic)
 ## 📜 License
 
 MIT License — free to use, modify, and distribute.
+
+## 🌟 Credits
+This project was made possible thanks to the foundational research and work of:
+- [Michael Cruickshank](https://github.com/MJCruickshank)
+- Mustafa A
+- [Tarig Ali](https://github.com/tariqabuobeida)
+- Mark Snoeck

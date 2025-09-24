@@ -27,7 +27,6 @@ KIND = dict(
     name=ModelKindName.INCREMENTAL_BY_UNIQUE_KEY,
     unique_key=("firms_id"),
     lookback="@validation_lookback",
-    batch_size=7,
 )
 
 

@@ -24,8 +24,11 @@ def entrypoint(evaluator: MacroEvaluator) -> str | exp.Expression:
     assert isinstance(in_ex, str), "in_ex must be set in blueprint"
     path = areas[in_ex]
 
-    if path is None or not os.path.exists(path):
+    if path is None:
         return "select null as id, null as geom limit 0"
+
+    if not os.path.exists(path):
+        raise FileExistsError(f"File '{path}' does not exist")
 
     file_mtime = os.path.getmtime(path)
 

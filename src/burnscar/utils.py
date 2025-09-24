@@ -8,15 +8,18 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 
-def retry(func, retries: int = 3, base: int = 2):
+def retry(
+    func, on: tuple[type[Exception]] = (Exception,), retries: int = 3, base: int = 2
+):
     def wrapper(*args, **kwargs):
         for r in range(retries):
             try:
                 return func(*args, **kwargs)
-            except Exception as e:
+            except on as e:
                 logger.error(f"Error on try {r}: {e}, waiting")
                 time.sleep(base**r)
-        raise ValueError("Failed after retries")
+
+        return func(*args, **kwargs)  # final try
 
     return wrapper
 

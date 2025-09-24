@@ -27,7 +27,7 @@ linter:
 
 model_defaults:
   dialect: duckdb
-  start: 2025-06-20
+  start: 2025-07-01
 
 variables:
   # Google Earth Engine
@@ -38,19 +38,22 @@ variables:
   country_id: "SDN" # ISO 3-letter country code
   gadm_level: 3 # This needs to match a level available from https://gadm.org
 
-  validation_lookback: 60
+  validation_lookback: 60 # This determines how many days we backfill missing data
 
   # validation parameters
   validation_params:
     buffer_distance: 1000 # area to buffer around the fire detection to use for validation
     days_around: 30 # Days before & after the event to consider for validation. This gives some play in case of cloud coverage
-    max_cloudy_percentage: 20 # Maximum percentage of the area of interest that may be covered by clouds
+    max_cloudy_percentage: 10 # Maximum percentage of the area of interest that may be covered by clouds
     burnt_pixel_count_threshold: 10 # Minimum number of burnt pixels to consider the event as burn scar
     max_nbr_after: -0.10 # The maximum allowed value of the Normalized Burn Ratio for the after image, used for classifying pixels as burnt
     min_nbr_difference: 0.15 # THe minimum difference in Normalized Burn Ratio between the before and after image
 
   # clustering
   clustering_max_date_gap: 2 # Maximum number of days since the previous event to be considered as the same cluster
+  clustering_max_distance: 500 # Maximum distance
+
+  geonames_max_distance: 10000 # Maximum distance to a nearby settlement.
 
   # paths
   path_gadm: ../data/gadm
