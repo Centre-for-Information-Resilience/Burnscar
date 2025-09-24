@@ -43,7 +43,6 @@ class NASARecord(BaseModel):
     class Config:
         frozen = True
 
-    country_id: str
     latitude: float
     longitude: float
     scan: float
@@ -76,7 +75,6 @@ class NASARecord(BaseModel):
     def __hash__(self):
         return hash(
             (
-                self.country_id,
                 self.latitude,
                 self.longitude,
                 self.acq_date,
@@ -122,7 +120,7 @@ class RateLimits:
 
 class NASAFetcher:
     satellites = ("SNPP", "NOAA20", "NOAA21")
-    base_url = "https://firms.modaps.eosdis.nasa.gov/api/country/csv"
+    base_url = "https://firms.modaps.eosdis.nasa.gov/api/area/csv"
 
     def __init__(
         self,
@@ -138,7 +136,12 @@ class NASAFetcher:
         self.rate_limits = RateLimits(api_key=api_key, client=self.client)
 
     @retry
-    def _fetch_raw(self, country_id: str, date: datetime.date, satellite: str) -> str:
+    def _fetch_raw(
+        self,
+        box: dict[str, float],
+        date: datetime.date,
+        satellite: str,
+    ) -> str:
         # wait for enough available transactions in our rate limit
         # NASA uses some sort of rolling window for rate limits
         self.rate_limits.update()
@@ -149,15 +152,17 @@ class NASAFetcher:
             time.sleep(10)
             self.rate_limits.update()
 
-        logger.debug(f"Fetching data for {country_id} on {date}")
+        logger.debug(f"Fetching data for {box} on {date}")
+
+        area = "{min_x},{min_y},{max_x},{max_y}".format(**box)
 
         url = (
             self.base_url
-            + f"/{self.api_key}/{self.instrument}_{satellite}_{self.data_version}/{country_id}/1/{date}"
+            + f"/{self.api_key}/{self.instrument}_{satellite}_{self.data_version}/{area}/1/{date}"
         )
         response = self.client.get(url)
 
-        if not response.text.startswith("country_id,latitude,longitude"):
+        if not response.text.startswith("latitude,longitude"):
             raise ValueError("Invalid response: " + response.text)
 
         return response.text
@@ -176,7 +181,7 @@ class NASAFetcher:
 
     def fetch(
         self,
-        country_id: str,
+        box: dict[str, float],
         date: datetime.date,
         satellites: Iterable[str] | None = None,
     ) -> list[NASARecord]:
@@ -185,7 +190,7 @@ class NASAFetcher:
         # by just country and date.
         parsed_data = []
         for satellite in satellites or self.satellites:
-            data = self._fetch_raw(country_id, date, satellite)
+            data = self._fetch_raw(box, date, satellite)
             parsed_data += self.parse(data)
 
         return parsed_data

@@ -2,13 +2,14 @@ import datetime
 import os
 import typing as t
 
+import duckdb
 import pandas as pd
 from dotenv import load_dotenv
+from sqlmesh.core.model import ModelKindName
 
 from burnscar.fetchers.nasa import NASAFetcher
 from burnscar.utils import date_range
 from sqlmesh import ExecutionContext, model
-from sqlmesh.core.model import ModelKindName
 
 
 @model(
@@ -52,16 +53,31 @@ def nasa_firms(
     country_id = context.var("country_id")
     assert country_id, "Country code must be set in the context variables"
 
+    gadm = context.resolve_table("reference.gadm")
+    box = context.fetchdf(
+        f"select st_extent(ST_Union_Agg(geom)) as box from {gadm}",
+    )["box"][0]
+
     fetcher = NASAFetcher(api_key=api_key_nasa)
 
     dfs = []
     dates = date_range(start.date(), end.date())
 
     for date in dates:
-        data = fetcher.fetch(country_id, date)
+        data = fetcher.fetch(box, date)
         dfs.append(fetcher.to_dataframe(data))
 
     df = pd.concat(dfs, ignore_index=True)
+
+    df = duckdb.query(
+        f"""
+        load spatial;
+        select '{country_id}' as country_id, *
+        from df
+        where st_within(st_point(longitude, latitude), (select ST_Union_Agg(geom) from {gadm}))
+        """,
+        connection=context.engine_adapter.connection,
+    ).df()
 
     if df.empty:
         yield from ()
