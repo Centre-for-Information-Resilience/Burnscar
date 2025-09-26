@@ -114,7 +114,7 @@ src/burnscar/       # Python source (fetchers, validators, logic)
 
 ## 🗺️ Data Sources
 
-* **FIRMS** – NASA MODIS/ VIIRS fire alerts: [nasa.gov](https://firms.modaps.eosdis.nasa.gov/map)
+* **FIRMS** – NASA MODIS/VIIRS fire alerts: [nasa.gov](https://firms.modaps.eosdis.nasa.gov/map)
 * **Copernicus Sentinel-2** – Post-burn surface reflectance: Accessed through Google Earth Engine, but can be explored using [Copernicus Browser](https://browser.dataspace.copernicus.eu)
 * **GADM** – Global administrative boundaries: [gadm.org](https://gadm.org/)
 * **GeoNames** - Open database of placenames: [geonames.org](https://www.geonames.org/)
