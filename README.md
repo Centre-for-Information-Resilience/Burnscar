@@ -37,7 +37,7 @@ Before you begin:
 ### 1. Clone this repository
 
 ```bash
-git clone https://github.com/Centre-for-Information-Resilience/Fire_mapping
+git clone https://github.com/Centre-for-Information-Resilience/Burnscar
 ````
 
 ### 2. Add credentials
